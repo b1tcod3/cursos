@@ -11,4 +11,4 @@
 5. **Chebyshev**:
 6. **Runge-Kutta**:
 
-
+$(x_0, y_0), \dots, (x_n, y_n)$
