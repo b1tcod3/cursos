@@ -49,6 +49,7 @@ $$ P_3(x) = \frac{1}{6}x^3 - x^2 + \frac{11}{6}x - 1 + 3x^3 - 15x^2 + 18x - \fra
 Agrupamos los términos semejantes:
 
 $$ P_3(x) = \left( \frac{1}{6} + 3 - \frac{31}{2} + 3 \right)x^3 + \left( -1 - 15 + 62 - 9 \right)x^2 + \left( \frac{11}{6} + 18 - \frac{93}{2} + 6 \right)x - 1 $$
+
 Por lo tanto, el polinomio de interpolación de Lagrange para los puntos dados es:
 
 $$ P_3(x) = -\frac{28}{3}x^3 + 37x^2 - \frac{62}{3}x - 1 $$
