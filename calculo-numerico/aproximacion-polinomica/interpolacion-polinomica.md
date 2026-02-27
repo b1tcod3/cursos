@@ -11,4 +11,16 @@
 5. **Chebyshev**:
 6. **Runge-Kutta**:
 
-$(x_0, y_0), \dots, (x_n, y_n)$
+## Método de Interpolación de Lagrange
+
+> **Formulación:**: Dado un conjunto de puntos $(x_0, y_0), (x_1, y_1), ..., (x_n, y_n)$, el polinomio de interpolación de Lagrange se define como:
+
+$$P(x) = \sum_{i=0}^{n} y_i L_i(x)$$
+
+donde los polinomios de base $L_i(x)$ se calculan como:
+
+$$L_i(x) = \prod_{\substack{j=0 \\ j \neq i}}^{n} \frac{x - x_j}{x_i - x_j}$$
+
+Cada polinomio de base $L_i(x)$ es igual a 1 en $x_i$ y 0 en los demás puntos para $i \neq j$, lo que garantiza que el polinomio de interpolación pase por todos los puntos dados.
+
+
