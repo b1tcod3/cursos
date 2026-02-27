@@ -51,8 +51,8 @@ def evaluar_polinomio(polinomio, x_valor):
     return polinomio.subs(x, x_valor)
 
 # Ejemplo de uso
-x_puntos = [1, 2, 4, 7]
-y_puntos = [3, 5, 9, 15]
+x_puntos = [0, 1, 2 , 3]
+y_puntos = [-1,6,31, 18]
 
 print("Datos de entrada:")
 print(f"x: {x_puntos}")
