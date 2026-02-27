@@ -40,11 +40,15 @@ $$ P_3(x) = -1 \cdot L_0(x) + 6 \cdot L_1(x) + 31 \cdot L_2(x) + 18 \cdot L_3(x)
 
 $$ P_3(x) = -1 \cdot \left(-\frac{1}{6}x^3 + x^2 - \frac{11}{6}x + 1\right) + 6 \cdot \left(\frac{1}{2}x^3 - \frac{5}{2}x^2 + 3x\right) + 31 \cdot \left(-\frac{1}{2}x^3 + 2x^2 - \frac{3}{2}x\right) + 18 \cdot \left(\frac{1}{6}x^3 - \frac{1}{2}x^2 + \frac{1}{3}x\right) $$
 
+eliminamos los denominadores bajo un denominador común. También cambiamos signos:
+
+$$ P_3(x) = \frac{1}{6}\left( x^3 - 6x^2 + 11x - 6 \right) + \frac{6}{2}\left( x^3 - 5x^2 + 6x \right) + \frac{31}{-2}\left( x^3 - 4x^2 + 3x \right) + \frac{18}{6}\left( x^3 - 3x^2 + 2x \right) $$
+
 $$ P_3(x) = \frac{1}{6}x^3 - x^2 + \frac{11}{6}x - 1 + 3x^3 - 15x^2 + 18x - \frac{31}{2}x^3 + 62x^2 - \frac{93}{2}x + 3x^3 - 9x^2 + 6x $$
 
-$$ P_3(x) = \left(\frac{1}{6} + 3 - \frac{31}{2} + 3\right)x^3 + \left(-1 - 15 + 62 - 9\right)x^2 + \left(\frac{11}{6} + 18 - \frac{93}{2} + 6\right)x - 1 $$
+Agrupamos los términos semejantes:
 
+$$ P_3(x) = \left( \frac{1}{6} + 3 - \frac{31}{2} + 3 \right)x^3 + \left( -1 - 15 + 62 - 9 \right)x^2 + \left( \frac{11}{6} + 18 - \frac{93}{2} + 6 \right)x - 1 $$
 Por lo tanto, el polinomio de interpolación de Lagrange para los puntos dados es:
-$P_3(x) = -\frac{25}{3}x^3 + 37x^2 - \frac{133}{6}x - 1$
 
-
+$$ P_3(x) = -\frac{28}{3}x^3 + 37x^2 - \frac{62}{3}x - 1 $$
