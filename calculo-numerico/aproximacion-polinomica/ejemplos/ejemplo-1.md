@@ -16,7 +16,7 @@ $$ P_n(x) = y_0 L_0(x) + y_1 L_1(x) + y2 L_2(x) + y_3 L_3(x) $$
 
 Calculamos cada uno de los términos $L_i(x)$:
 
-## $ L_0(x) $
+## $L_0(x)$
 $$ L_0(x) = \frac{(x - x_1)(x - x_2)(x - x_3)}{(x_0 - x_1)(x_0 - x_2)(x_0 - x_3)} = \frac{(x - 1)(x - 2)(x - 3)}{(0 - 1)(0 - 2)(0 - 3)} = \frac{(x - 1)(x - 2)(x - 3)}{-6}  $$
 
 $$ L_0(x) = \frac{ x^3 - 6x^2 + 11x - 6}{-6} = -\frac{1}{6}x^3 + x^2 - \frac{11}{6}x + 1 $$
