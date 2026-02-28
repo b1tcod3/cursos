@@ -4,7 +4,7 @@
 
 ## Principales métodos de interpolación polinómica
 
-1. **Lagrange**:
+1. **Lagrange**: [Ejemplo 1](./ejemplos/ejemplo-1.md) | [Código Python](./codigo/langrage-polinomio.py)
 2. **Newton**:
 3. **Hermite**:
 4. **Spline**:
@@ -22,5 +22,9 @@ donde los polinomios de base $L_i(x)$ se calculan como:
 $$L_i(x) = \prod_{\substack{j=0 \\ j \neq i}}^{n} \frac{x - x_j}{x_i - x_j}$$
 
 Cada polinomio de base $L_i(x)$ es igual a 1 en $x_i$ y 0 en los demás puntos para $i \neq j$, lo que garantiza que el polinomio de interpolación pase por todos los puntos dados.
+
+**Ejemplo práctico**: Consulta el [Ejemplo 1](./ejemplos/ejemplo-1.md) para ver una aplicación paso a paso del método de Lagrange.
+
+**Implementación**: Revisa el [código en Python](./codigo/langrage-polinomio.py) que implementa el algoritmo de interpolación de Lagrange.
 
 
