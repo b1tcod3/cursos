@@ -27,4 +27,12 @@ Cada polinomio de base $L_i(x)$ es igual a 1 en $x_i$ y 0 en los demás puntos p
 
 **Implementación**: Revisa el [código en Python](./codigo/langrage-polinomio.py) que implementa el algoritmo de interpolación de Lagrange.
 
+## Método de Interpolación de Newton
+
+> **Formulación:**: Expresa el polinomio interpolador en una base diferente, asociadas a los nodos de interpolación:
+
+$$P(x) = f[x_0] + f[x_0, x_1](x - x_0) + f[x_0, x_1, x_2](x - x_0)(x - x_1) + ... + f[x_0, x_1, ..., x_n](x - x_0)(x - x_1)...(x - x_{n-1})$$
+
+
+
 
