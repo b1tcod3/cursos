@@ -33,6 +33,21 @@ Cada polinomio de base $L_i(x)$ es igual a 1 en $x_i$ y 0 en los demás puntos p
 
 $$P(x) = f[x_0] + f[x_0, x_1](x - x_0) + f[x_0, x_1, x_2](x - x_0)(x - x_1) + ... + f[x_0, x_1, ..., x_n](x - x_0)(x - x_1)...(x - x_{n-1})$$
 
+Los coeficientes $f[x_0, x_1, ..., x_k]$ se denominan diferencias divididas y se calculan de manera recursiva a partir de los valores de la función en los puntos dados:
 
+$$f[x_0, ..., x_n] = \frac{f[x_1, ..., x_n] - f[x_0, ..., x_{n-1}]}{x_n - x_0}$$
 
+con la condición inicial $f[x_k] = f(x_k)$.
+
+Este método es especialmente útil cuando se agregan nuevos puntos de interpolación, ya que permite actualizar el polinomio sin necesidad de recalcular todo desde cero.
+
+### Tabla de Diferencias Divididas
+El cálculo de las diferencia divididas se puede organizar en una tabla triangular donde cada columna se obtiene recurvisamente a partir de la anterior. Los coeficientes del polinomio interpolador son las diferencias divididas de la diagonal principal de la tabla.
+
+| $x_i$ | $f[x_i]$ | $f[x_i, x_{i+1}]$ | $f[x_i, x_{i+1}, x_{i+2}]$ | ... |
+|------|---------|-------------------|-----------------------------|-----|
+| $x_0$ | $f[x_0]$ | $f[x_0, x_1]$ | $f[x_0, x_1, x_2]$ | ... |
+| $x_1$ | $f[x_1]$ | $f[x_1, x_2]$ | $f[x_1, x_2, x_3]$ | ... |
+| $x_2$ | $f[x_2]$ | $f[x_2, x_3]$ | $f[x_2, x_3, x_4]$ | ... |
+| ...  |
 
