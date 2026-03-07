@@ -40,9 +40,13 @@ Sustituyendo los valores en la tabla:
 | $1$ | $2$ | $-2$ | $-1$ |
 | $0$ | $4$ | $2$ | |
 | $-3$ | $-2$ | | |
+
 Finalmente, el polinomio de interpolación de Newton es:
+
 $$ P(x) = 2 - 2(x - 1) - 1(x - 1)(x - 0) $$
+
 Simplificando:
+
 $$ P(x) = 2 - 2(x - 1) - (x - 1)x $$
 $$ P(x) = 2 - 2x + 2 - x^2 + x $$
 $$ P(x) = -x^2 - x + 4 $$
