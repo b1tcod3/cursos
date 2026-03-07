@@ -51,3 +51,8 @@ El cálculo de las diferencia divididas se puede organizar en una tabla triangul
 | $x_2$ | $f[x_2]$ | $f[x_2, x_3]$ | $f[x_2, x_3, x_4]$ | ... |
 | ...  |
 
+**Ejemplo práctico**: Consulta el [Ejemplo 2](./ejemplos/ejemplo-2.md) para ver una aplicación paso a paso del método de Newton.
+
+**Implementación**: Revisa el [código en Python](./codigo/langrage-polinomio.py) que implementa el algoritmo de interpolación de Lagrange.
+
+
