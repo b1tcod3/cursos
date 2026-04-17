@@ -30,10 +30,8 @@ Usamos los mismos puntos que en los ejemplos de Lagrange y Newton para mantener 
 
 El polinomio de Hermite con 3 nodos tiene grado 5:
 
-\[
-H(x) = 2 - 3(x-1) + 5(x-1)^2 - 2(x-1)^2x + (x-1)^2x^2 + \cdots
-\]
+$$H(x) = 2 - 3(x-1) + 5(x-1)^2 - 2(x-1)^2x + (x-1)^2x^2 + \cdots$$
 
-Simplificado: \(H(x) = -x^2 - x + 4\)
+Simplificado: $H(x) = -x^2 - x + 4$
 
 **Nota**: En este caso particular, el polinomio de Hermite coincide con el de Newton porque los datos provienen de un polinomio cuadrático. El método de Hermite es más útil cuando se conoce la derivada de la función original o cuando se quiere una interpolación más suave.

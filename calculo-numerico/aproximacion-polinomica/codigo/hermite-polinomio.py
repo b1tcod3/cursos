@@ -18,7 +18,7 @@ def diferencias_divididas_hermite(x_vals, y_vals, dy_vals):
     for j in range(1, n):
         for i in range(n - j):
             if x_vals[i + j] == x_vals[i]:
-                tabla[i][j] = dy_vals[i] / sp.factorial(j)
+                tabla[i][j] = dy_vals[i]
             else:
                 tabla[i][j] = (tabla[i + 1][j - 1] - tabla[i][j - 1]) / (x_vals[i + j] - x_vals[i])
     
