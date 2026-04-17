@@ -53,7 +53,7 @@ El cálculo de las diferencia divididas se puede organizar en una tabla triangul
 
 **Ejemplo práctico**: Consulta el [Ejemplo 2](./ejemplos/ejemplo-2.md) para ver una aplicación paso a paso del método de Newton.
 
-**Implementación**: Revisa el [código en Python](./codigo/langrage-polinomio.py) que implementa el algoritmo de interpolación de Lagrange.
+**Implementación**: Revisa el [código en Python](./codigo/newton-polinomio.py) que implementa el algoritmo de interpolación de Newton.
 
 ## Interpolación de Hermite
 
