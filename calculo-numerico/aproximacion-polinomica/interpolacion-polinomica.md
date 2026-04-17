@@ -5,8 +5,8 @@
 ## Principales métodos de interpolación polinómica
 
 1. **Lagrange**: [Ejemplo 1](./ejemplos/ejemplo-1.md) | [Código Python](./codigo/langrage-polinomio.py)
-2. **Newton**:
-3. **Hermite**:
+2. **Newton**: [Ejemplo 2](./ejemplos/ejemplo-2.md) | [Código Python](./codigo/newton-polinomio.py)
+3. **Hermite**: [Ejemplo 3](./ejemplos/ejemplo-3.md) | [Código Python](./codigo/hermite-polinomio.py)
 4. **Spline**:
 5. **Chebyshev**:
 6. **Runge-Kutta**:
@@ -54,5 +54,81 @@ El cálculo de las diferencia divididas se puede organizar en una tabla triangul
 **Ejemplo práctico**: Consulta el [Ejemplo 2](./ejemplos/ejemplo-2.md) para ver una aplicación paso a paso del método de Newton.
 
 **Implementación**: Revisa el [código en Python](./codigo/langrage-polinomio.py) que implementa el algoritmo de interpolación de Lagrange.
+
+## Interpolación de Hermite
+
+La interpolación de Hermite es un método de aproximación polinómica que generaliza la interpolación clásica al incorporar información no solo de los valores de la función, sino también de sus derivadas en los nodos de interpolación.
+
+## Definición del problema
+
+Dados \(n+1\) puntos distintos \(x_0, x_1, \ldots, x_n\), se conocen los valores de la función \(f(x_i)\) y de su derivada \(f'(x_i)\) en cada nodo. El objetivo es encontrar un polinomio \(H(x)\) de grado mínimo que satisfaga:
+
+\[
+H(x_i) = f(x_i), \quad H'(x_i) = f'(x_i), \quad i = 0, 1, \ldots, n
+\]
+
+Este polinomio existe, es único, y tiene grado \(2n+1\), ya que se dispone de \(2n+2\) datos para construirlo (n+1 valores de la función y n+1 valores de la derivada).
+
+## Construcción mediante diferencias divididas
+
+### Nodos repetidos
+
+Para construir el polinomio de Hermite usando el método de Newton con diferencias divididas, se define un conjunto de puntos \(z_0, z_1, \ldots, z_{2n+1}\) donde cada nodo \(x_i\) aparece repetido dos veces:
+
+\[
+z_{2i} = z_{2i+1} = x_i, \quad i = 0, 1, \ldots, n
+\]
+
+### Fórmula de diferencias divididas con nodos repetidos
+
+La tabla de diferencias divididas se construye siguiendo estas reglas:
+
+Para nodos ordenados \(x_0 \leq x_1 \leq \cdots \leq x_k\):
+
+\[
+f[x_0, x_1, \ldots, x_k] = 
+\begin{cases}
+\displaystyle\frac{f^{(k)}(x_0)}{k!} & \text{si } x_0 = x_k \\[0.3cm]
+\displaystyle\frac{f[x_1, \ldots, x_k] - f[x_0, \ldots, x_{k-1}]}{x_k - x_0} & \text{si } x_0 \neq x_k
+\end{cases}
+\]
+
+**Reglas clave:**
+- Cuando los nodos son idénticos: \(f[x_i, x_i] = f'(x_i)\)
+- Para tres nodos repetidos: \(f[x_i, x_i, x_i] = \frac{f''(x_i)}{2!}\)
+- En general: \(f[x_i, x_i, \ldots, x_i] = \frac{f^{(j)}(x_i)}{j!}\) donde \(j\) es el número de repeticiones menos 1
+
+### Tabla de diferencias divididas para Hermite
+
+La tabla se construye repitiendo cada nodo y colocando las derivadas según corresponda. Para el caso de dos nodos \((x_0, x_1)\) con sus respectivas derivadas \((d_0, d_1)\):
+
+| \(x_i\) | D.D. Orden 0 | D.D. Orden 1 | D.D. Orden 2 | D.D. Orden 3 |
+|---------|--------------|--------------|--------------|--------------|
+| \(x_0\) | \(y_0\) | | | |
+| \(x_0\) | \(y_0\) | \(d_0\) | | |
+| \(x_1\) | \(y_1\) | \(P_1\) | \(\frac{P_1 - d_0}{h}\) | |
+| \(x_1\) | \(y_1\) | \(d_1\) | \(\frac{d_1 - P_1}{h}\) | \(\frac{d_0 + d_1 - 2P_1}{h^2}\) |
+
+Donde \(P_1 = \frac{y_1 - y_0}{h}\) y \(h = x_1 - x_0\).
+
+## Fórmula del polinomio de Hermite
+
+El polinomio se expresa mediante la fórmula de Newton:
+
+\[
+H(x) = \sum_{k=0}^{2n+1} f[z_0, z_1, \ldots, z_k] \prod_{j=0}^{k-1}(x - z_j)
+\]
+
+Los coeficientes son las diferencias divididas que aparecen en la primera celda de cada columna de la tabla (diagonal superior).
+
+### Ejemplo para dos nodos
+
+Para dos nodos, el polinomio cúbico de Hermite es:
+
+\[
+H(x) = y_0 + d_0(x-x_0) + \frac{P_1 - d_0}{h}(x-x_0)^2 + \frac{d_0 + d_1 - 2P_1}{h^2}(x-x_0)^2(x-x_1)
+\]
+
+**Ejemplo práctico**: Consulta el [Ejemplo 3](./ejemplos/ejemplo-3.md) para ver una aplicación paso a paso del método de Hermite.
 
 
