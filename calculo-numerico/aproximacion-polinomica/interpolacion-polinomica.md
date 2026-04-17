@@ -102,12 +102,12 @@ f[x_0, x_1, \ldots, x_k] =
 
 La tabla se construye repitiendo cada nodo y colocando las derivadas según corresponda. Para el caso de dos nodos \((x_0, x_1)\) con sus respectivas derivadas \((d_0, d_1)\):
 
-| \(x_i\) | D.D. Orden 0 | D.D. Orden 1 | D.D. Orden 2 | D.D. Orden 3 |
-|---------|--------------|--------------|--------------|--------------|
-| \(x_0\) | \(y_0\) | | | |
-| \(x_0\) | \(y_0\) | \(d_0\) | | |
-| \(x_1\) | \(y_1\) | \(P_1\) | \(\frac{P_1 - d_0}{h}\) | |
-| \(x_1\) | \(y_1\) | \(d_1\) | \(\frac{d_1 - P_1}{h}\) | \(\frac{d_0 + d_1 - 2P_1}{h^2}\) |
+| x_i | D.D. Orden 0 | D.D. Orden 1 | D.D. Orden 2 | D.D. Orden 3 |
+|-----|---------------|---------------|---------------|---------------|
+| x_0 | y_0 | | | |
+| x_0 | y_0 | d_0 | | |
+| x_1 | y_1 | P_1 | (P_1 - d_0)/h | |
+| x_1 | y_1 | d_1 | (d_1 - P_1)/h | (d_0 + d_1 - 2P_1)/h^2 |
 
 Donde \(P_1 = \frac{y_1 - y_0}{h}\) y \(h = x_1 - x_0\).
 
