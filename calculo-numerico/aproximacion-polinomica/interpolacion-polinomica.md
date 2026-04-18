@@ -1,4 +1,6 @@
-# Interpolación Polinómica
+# Interpolación Polinómica 📐
+
+La interpolación polinómica es una herramienta fundamental en el análisis numérico, ya que permite aproximar funciones complejas o datos discretos mediante una expresión algebraica manejable: el polinomio.
 
 > **Definición:**: Es una técnica que consiste en encontrar un polinomio que pase exactamente por un conjunto de puntos dados. Dado un conjunto de $n+1$ puntos, existe un único polinomio de grado *n* que satisface todas las condiciones de interpolación, resultado garantizado por el determinante de Vandermonde.
 
@@ -13,7 +15,9 @@
 
 ## Método de Interpolación de Lagrange
 
-> **Formulación:**: Dado un conjunto de puntos $(x_0, y_0), (x_1, y_1), ..., (x_n, y_n)$, el polinomio de interpolación de Lagrange se define como:
+Este método en lugar de esolver un sistema de ecuaciones complicado, Lagrange propone armar el polinomio como una "combinación" de piezas más simples llamadas polinomios base($L_i$).
+
+> **Formulación:** Dado un conjunto de puntos $(x_0, y_0), (x_1, y_1), ..., (x_n, y_n)$, el polinomio de interpolación de Lagrange se define como:
 
 $$P(x) = \sum_{i=0}^{n} y_i L_i(x)$$
 
@@ -21,7 +25,11 @@ donde los polinomios de base $L_i(x)$ se calculan como:
 
 $$L_i(x) = \prod_{\substack{j=0 \\ j \neq i}}^{n} \frac{x - x_j}{x_i - x_j}$$
 
-Cada polinomio de base $L_i(x)$ es igual a 1 en $x_i$ y 0 en los demás puntos para $i \neq j$, lo que garantiza que el polinomio de interpolación pase por todos los puntos dados.
+Cada $L_i(x)$ es un polinomio de grado $n$ con las siguientes propiedades:
+- Cada bloque $L_i$ vale 1 cuando evaluamos en su propio punto $x_i$.
+- Ese mismo bloque vale 0 en todos los demás puntos de la lista.
+
+En resumen, cada polinomio de base $L_i(x)$ es igual a 1 en $x_i$ y 0 en los demás puntos para $i \neq j$, lo que garantiza que el polinomio de interpolación pase por todos los puntos dados.
 
 **Ejemplo práctico**: Consulta el [Ejemplo 1](./ejemplos/ejemplo-1.md) para ver una aplicación paso a paso del método de Lagrange.
 
@@ -29,7 +37,7 @@ Cada polinomio de base $L_i(x)$ es igual a 1 en $x_i$ y 0 en los demás puntos p
 
 ## Método de Interpolación de Newton
 
-> **Formulación:**: Expresa el polinomio interpolador en una base diferente, asociadas a los nodos de interpolación:
+> **Formulación:** Expresa el polinomio interpolador en una base diferente, asociadas a los nodos de interpolación:
 
 $$P(x) = f[x_0] + f[x_0, x_1](x - x_0) + f[x_0, x_1, x_2](x - x_0)(x - x_1) + ... + f[x_0, x_1, ..., x_n](x - x_0)(x - x_1)...(x - x_{n-1})$$
 
@@ -42,6 +50,7 @@ con la condición inicial $f[x_k] = f(x_k)$.
 Este método es especialmente útil cuando se agregan nuevos puntos de interpolación, ya que permite actualizar el polinomio sin necesidad de recalcular todo desde cero.
 
 ### Tabla de Diferencias Divididas
+
 El cálculo de las diferencia divididas se puede organizar en una tabla triangular donde cada columna se obtiene recurvisamente a partir de la anterior. Los coeficientes del polinomio interpolador son las diferencias divididas de la diagonal principal de la tabla.
 
 | $x_i$ | $f[x_i]$ | $f[x_i, x_{i+1}]$ | $f[x_i, x_{i+1}, x_{i+2}]$ | ... |
@@ -57,17 +66,13 @@ El cálculo de las diferencia divididas se puede organizar en una tabla triangul
 
 ## Interpolación de Hermite
 
-La interpolación de Hermite es un método de aproximación polinómica que generaliza la interpolación clásica al incorporar información no solo de los valores de la función, sino también de sus derivadas en los nodos de interpolación.
-
-## Definición del problema
+> **Definición:** La interpolación de Hermite es un método de aproximación polinómica que generaliza la interpolación clásica al incorporar información no solo de los valores de la función, sino también de sus derivadas en los nodos de interpolación.
 
 Dados $n+1$ puntos distintos $x_0, x_1, \ldots, x_n$, se conocen los valores de la función $f(x_i)$ y de su derivada $f'(x_i)$ en cada nodo. El objetivo es encontrar un polinomio $H(x)$ de grado mínimo que satisfaga:
 
 $$H(x_i) = f(x_i), \quad H'(x_i) = f'(x_i), \quad i = 0, 1, \ldots, n$$
 
 Este polinomio existe, es único, y tiene grado $2n+1$, ya que se dispone de $2n+2$ datos para construirlo ($n+1$ valores de la función y $n+1$ valores de la derivada).
-
-## Construcción mediante diferencias divididas
 
 ### Nodos repetidos
 
@@ -103,15 +108,13 @@ La tabla se construye repitiendo cada nodo y colocando las derivadas según corr
 
 Donde $P_1 = \frac{y_1 - y_0}{h}$ y $h = x_1 - x_0$.
 
-## Fórmula del polinomio de Hermite
+### Fórmula del polinomio de Hermite
 
 El polinomio se expresa mediante la fórmula de Newton:
 
 $$H(x) = \sum_{k=0}^{2n+1} f[z_0, z_1, \ldots, z_k] \prod_{j=0}^{k-1}(x - z_j)$$
 
 Los coeficientes son las diferencias divididas que aparecen en la primera celda de cada columna de la tabla (diagonal superior).
-
-### Ejemplo para dos nodos
 
 Para dos nodos, el polinomio cúbico de Hermite es:
 
