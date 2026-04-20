@@ -79,19 +79,9 @@ La fórmula general es:
 
 $$f[x_i, ..., x_{i+k}] = \frac{f[x_{i+1}, ..., x_{i+k}] - f[x_i, ..., x_{i+k-1}]}{x_{i+k} - x_i}$$
 
-#### 4. Ejemplo con Números
+#### 4. Ejemplo	numérico
 
-Usemos tres puntos simples: $(0, -1)$, $(1, 6)$ y $(2, 31)$.
-
-- **Nivel 0**: Son solo las $y$ → $\{-1, 6, 31\}$
-
-- **Nivel 1**:
-  - Entre 0 y 1: $\frac{6 - (-1)}{1 - 0} = 7$
-  - Entre 1 y 2: $\frac{31 - 6}{2 - 1} = 25$
-
-- **Nivel 2**:
-  - Usamos los resultados previos (25 y 7) y los extremos de $x$ (2 y 0):
-  - $\frac{25 - 7}{2 - 0} = \frac{18}{2} = 9$
+> **Nota:** El ejemplo numérico se encuentra en el archivo de [Ejemplo 2](./ejemplos/ejemplo-2.md).
 
 **Ejemplo práctico**: Consulta el [Ejemplo 2](./ejemplos/ejemplo-2.md) para ver una aplicación paso a paso del método de Newton.
 
