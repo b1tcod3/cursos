@@ -1,3 +1,23 @@
+"""
+MÓDULO DE INTERPOLACIÓN POLINÓMICA DE LAGRANGE
+
+Este script implementa el método de Lagrange para hallar el único polinomio 
+de grado n que pasa exactamente por un conjunto de n+1 puntos dados.
+
+ALGORITMO:
+1. Definir la variable simbólica 'x' mediante SymPy.
+2. Iterar sobre cada punto (xi, yi) del conjunto de datos.
+3. Para cada punto 'i', calcular el Polinomio Base Li(x):
+   Li(x) = Π [ (x - xj) / (xi - xj) ] para todo j != i.
+4. Construir el Polinomio Interpolador P(x) como la sumatoria:
+   P(x) = Σ [ yi * Li(x) ].
+5. Simplificar la expresión algebraica resultante.
+
+PROPIEDADES:
+- El determinante de Vandermonde garantiza la unicidad del polinomio.
+- Complejidad computacional: O(n^2).
+"""
+
 import sympy as sp  # Biblioteca para cálculo simbólico (maneja la 'x' como variable)
 import numpy as np  # Para crear arreglos numéricos y rangos
 import matplotlib.pyplot as plt  # Para generar la gráfica final
