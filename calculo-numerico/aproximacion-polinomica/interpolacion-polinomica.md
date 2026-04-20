@@ -79,10 +79,6 @@ La fórmula general es:
 
 $$f[x_i, ..., x_{i+k}] = \frac{f[x_{i+1}, ..., x_{i+k}] - f[x_i, ..., x_{i+k-1}]}{x_{i+k} - x_i}$$
 
-#### 4. Ejemplo	numérico
-
-> **Nota:** El ejemplo numérico se encuentra en el archivo de [Ejemplo 2](./ejemplos/ejemplo-2.md).
-
 **Ejemplo práctico**: Consulta el [Ejemplo 2](./ejemplos/ejemplo-2.md) para ver una aplicación paso a paso del método de Newton.
 
 **Implementación**: Revisa el [código en Python](./codigo/newton-polinomio.py) que implementa el algoritmo de interpolación de Newton.
