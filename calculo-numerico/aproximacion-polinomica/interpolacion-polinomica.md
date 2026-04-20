@@ -53,14 +53,45 @@ Este método es especialmente útil cuando se agregan nuevos puntos de interpola
 
 ### Tabla de Diferencias Divididas
 
-El cálculo de las diferencia divididas se puede organizar en una tabla triangular donde cada columna se obtiene recurvisamente a partir de la anterior. Los coeficientes del polinomio interpolador son las diferencias divididas de la diagonal principal de la tabla.
+> La tabla de diferencias divididas es una estructura triangular donde cada columna representa un nivel de "tasa de cambio" entre los puntos. Es el motor que alimenta al método de Newton.
 
-| $x_i$ | $f[x_i]$ | $f[x_i, x_{i+1}]$ | $f[x_i, x_{i+1}, x_{i+2}]$ | ... |
-|------|---------|-------------------|-----------------------------|-----|
-| $x_0$ | $f[x_0]$ | $f[x_0, x_1]$ | $f[x_0, x_1, x_2]$ | ... |
-| $x_1$ | $f[x_1]$ | $f[x_1, x_2]$ | $f[x_1, x_2, x_3]$ | ... |
-| $x_2$ | $f[x_2]$ | $f[x_2, x_3]$ | $f[x_2, x_3, x_4]$ | ... |
-| ...  |
+#### 1. La Disposición de los Datos
+
+Primero, colocas tus puntos $(x_i, f[x_i])$ en las dos primeras columnas. El resto de las columnas se irán llenando hacia la derecha.
+
+| i | $x_i$ | $f[x_i]$ (Nivel 0) | Primera (Nivel 1) | Segunda (Nivel 2) |
+|---|-------|-------------------|-------------------|-------------------|
+| 0 | $x_0$ | $y_0$ | | |
+| 1 | $x_1$ | $y_1$ | $f[x_0, x_1]$ | |
+| 2 | $x_2$ | $y_2$ | $f[x_1, x_2]$ | $f[x_0, x_1, x_2]$ |
+
+#### 2. Cálculo del Nivel 1 (Pendientes Simples)
+
+Para obtener el valor entre dos puntos, restas sus $y$ y lo divides por la resta de sus $x$. Es exactamente la fórmula de la pendiente de una recta:
+
+$$f[x_i, x_{i+1}] = \frac{f[x_{i+1}] - f[x_i]}{x_{i+1} - x_i}$$
+
+#### 3. Cálculo de Niveles Superiores (La Regla General)
+
+A medida que avanzas a la derecha, usas los resultados de la columna anterior. Lo más importante aquí es la resta en el denominador: siempre usas las $x$ de los extremos que abarca esa diferencia.
+
+La fórmula general es:
+
+$$f[x_i, ..., x_{i+k}] = \frac{f[x_{i+1}, ..., x_{i+k}] - f[x_i, ..., x_{i+k-1}]}{x_{i+k} - x_i}$$
+
+#### 4. Ejemplo con Números
+
+Usemos tres puntos simples: $(0, -1)$, $(1, 6)$ y $(2, 31)$.
+
+- **Nivel 0**: Son solo las $y$ → $\{-1, 6, 31\}$
+
+- **Nivel 1**:
+  - Entre 0 y 1: $\frac{6 - (-1)}{1 - 0} = 7$
+  - Entre 1 y 2: $\frac{31 - 6}{2 - 1} = 25$
+
+- **Nivel 2**:
+  - Usamos los resultados previos (25 y 7) y los extremos de $x$ (2 y 0):
+  - $\frac{25 - 7}{2 - 0} = \frac{18}{2} = 9$
 
 **Ejemplo práctico**: Consulta el [Ejemplo 2](./ejemplos/ejemplo-2.md) para ver una aplicación paso a paso del método de Newton.
 
