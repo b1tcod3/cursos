@@ -9,7 +9,7 @@ La interpolación polinómica es una herramienta fundamental en el análisis num
 1. **Lagrange**: [Ejemplo 1](./ejemplos/ejemplo-1.md) | [Código Python](./codigo/langrage-polinomio.py)
 2. **Newton**: [Ejemplo 2](./ejemplos/ejemplo-2.md) | [Código Python](./codigo/newton-polinomio.py)
 3. **Hermite**: [Ejemplo 3](./ejemplos/ejemplo-3.md) | [Código Python](./codigo/hermite-polinomio.py)
-4. **Spline**:
+4. **Spline**: [Ejemplo 4](./ejemplos/ejemplo-4.md) | [Código Python](./codigo/spline-polinomio.py)
 5. **Chebyshev**:
 6. **Runge-Kutta**:
 
@@ -140,5 +140,45 @@ Para dos nodos, el polinomio cúbico de Hermite es:
 $$H(x) = y_0 + d_0(x-x_0) + \frac{P_1 - d_0}{h}(x-x_0)^2 + \frac{d_0 + d_1 - 2P_1}{h^2}(x-x_0)^2(x-x_1)$$
 
 **Ejemplo práctico**: Consulta el [Ejemplo 3](./ejemplos/ejemplo-3.md) para ver una aplicación paso a paso del método de Hermite.
+
+
+## Método de Splines (Splines Cúbicos)
+
+> **Definición:** La interpolación por splines (o trazadores) es un método de aproximación polinómica a trozos que evita el fenómeno de Runge asociado a los polinomios de grado alto. En lugar de usar un único polinomio global para todos los nodos, emplea polinomios de grado menor (generalmente de tercer grado) entre cada par de puntos adyacentes, garantizando que la curva resultante sea suave y continua en sus derivadas.
+
+Dados $n+1$ puntos ordenados $x_0 < x_1 < \ldots < x_n$, se conocen los valores de la función $f(x_i)$ en cada nodo. El objetivo es encontrar una función definida a trozos $S(x)$ formada por $n$ polinomios cúbicos $S_j(x)$, donde cada polinomio es válido en su respectivo subintervalo $[x_j, x_{j+1}]$ para $j = 0, 1, \ldots, n-1$.
+
+### Construcción mediante condiciones de continuidad
+
+Como tenemos $n$ intervalos y cada polinomio cúbico tiene 4 coeficientes ($a, b, c, d$), necesitamos determinar $4n$ incógnitas. Estas se obtienen aplicando un conjunto de condiciones de frontera e interiores:
+
+- **Interpolación:** $S_j(x_j) = f(x_j)$ y $S_j(x_{j+1}) = f(x_{j+1})$ (la función pasa por todos los puntos dados).
+- **Continuidad de la función:** $S_j(x_{j+1}) = S_{j+1}(x_{j+1})$ (los tramos se conectan sin saltos).
+- **Continuidad de la 1ª derivada:** $S'_j(x_{j+1}) = S'_{j+1}(x_{j+1})$ (no hay "picos", la pendiente es suave).
+- **Continuidad de la 2ª derivada:** $S''_j(x_{j+1}) = S''_{j+1}(x_{j+1})$ (la curvatura es continua).
+
+Estas reglas dan $4n-2$ ecuaciones. Las 2 restantes provienen de las condiciones en los extremos del intervalo total ($x_0$ y $x_n$).
+
+### Tipos de condiciones de frontera
+
+- **Spline Natural:** Supone que la segunda derivada en los extremos es cero: $S''(x_0) = 0$, $S''(x_n) = 0$.
+- **Spline Sujeto (Clamped):** Se especifica la primera derivada en los extremos: $S'(x_0) = f'(x_0)$, $S'(x_n) = f'(x_n)$.
+
+### Fórmula de los polinomios de Spline
+
+El polinomio cúbico en cada subintervalo $[x_j, x_{j+1}]$ se expresa en la forma:
+
+$$S_j(x) = a_j + b_j(x - x_j) + c_j(x - x_j)^2 + d_j(x - x_j)^3$$
+
+Definiendo la distancia entre nodos como $h_j = x_{j+1} - x_j$, los coeficientes se determinan así:
+
+1. $a_j = f(x_j)$
+2. Los coeficientes $c_j$ se calculan resolviendo un **sistema tridiagonal** para los nodos interiores.
+3. $b_j = \frac{f(x_{j+1}) - f(x_j)}{h_j} - \frac{h_j(2c_j + c_{j+1})}{3}$
+4. $d_j = \frac{c_{j+1} - c_j}{3h_j}$
+
+**Ejemplo práctico**: Consulta el [Ejemplo 4](./ejemplos/ejemplo-4.md) para ver una aplicación paso a paso del método de Splines.
+
+**Implementación**: Revisa el [código en Python](./codigo/spline-polinomio.py) que implementa el algoritmo de interpolación por Splines Cúbicos.
 
 
