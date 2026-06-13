@@ -4,14 +4,36 @@ La interpolación polinómica es una herramienta fundamental en el análisis num
 
 > **Definición:**: Es una técnica que consiste en encontrar un polinomio que pase exactamente por un conjunto de puntos dados. Dado un conjunto de $n+1$ puntos, existe un único polinomio de grado *n* que satisface todas las condiciones de interpolación, resultado garantizado por el determinante de Vandermonde.
 
+## Teorema de Existencia y Unicidad de la Interpolación Polinómica
+
+El teorema de existencia y unicidad es el pilar fundamental sobre el que se construye toda la teoría de la interpolación polinómica clásica. Garantiza que, sin importar el método algebraico que se utilice —Lagrange o Newton—, el polinomio resultante será exactamente el mismo, aunque esté expresado de forma diferente.
+
+### Enunciado
+
+Dados $n+1$ puntos distintos $(x_0, y_0), (x_1, y_1), \dots, (x_n, y_n)$, con $x_i \neq x_j$ para todo $i \neq j$, **existe un único polinomio** $P(x)$ de grado menor o igual a $n$ tal que:
+
+$$P(x_i) = y_i \quad \text{para todo } i = 0, 1, \dots, n$$
+
+### Demostraciones
+
+El teorema puede demostrarse por dos vías principales. La demostración completa de ambas se encuentra en el archivo de [Demostración del Teorema de Unicidad](./demostraciones/unicidad.md).
+
+**1. Por el Teorema Fundamental del Álgebra (reducción al absurdo):** Suponiendo dos polinomios $P(x)$ y $Q(x)$ que interpolan los mismos puntos, su diferencia $D(x) = P(x) - Q(x)$ se anula en $n+1$ nodos. Un polinomio de grado $\le n$ con $n+1$ raíces debe ser el polinomio nulo, por lo que $P = Q$.
+
+**2. Por Álgebra Lineal (Matriz de Vandermonde):** El sistema $Va = y$ tiene matriz de Vandermonde con determinante $\det(V) = \prod_{i < j} (x_j - x_i) \neq 0$, lo que garantiza solución única para los coeficientes.
+
+### Implicación práctica
+
+Una consecuencia directa es que **no existen diferencias de precisión teórica entre el Polinomio de Lagrange y el de Newton** si se aplican sobre los mismos datos. Ambos son algoritmos numéricos diferentes para encontrar el mismo y único polinomio. La elección entre uno u otro recae en la eficiencia computacional: Newton permite agregar nuevos puntos sin recalcular todo, mientras que Lagrange no.
+
 ## Principales métodos de interpolación polinómica
 
 1. **Lagrange**: [Ejemplo 1](./ejemplos/ejemplo-1.md) | [Código Python](./codigo/langrage-polinomio.py)
 2. **Newton**: [Ejemplo 2](./ejemplos/ejemplo-2.md) | [Código Python](./codigo/newton-polinomio.py)
 3. **Hermite**: [Ejemplo 3](./ejemplos/ejemplo-3.md) | [Código Python](./codigo/hermite-polinomio.py)
 4. **Spline**: [Ejemplo 4](./ejemplos/ejemplo-4.md) | [Código Python](./codigo/spline-polinomio.py)
-5. **Chebyshev**:
-6. **Runge-Kutta**:
+5. **Chebyshev**: [Ejemplo 5](./ejemplos/ejemplo-5.md) | [Código Python](./codigo/chebyshev-polinomio.py)
+6. **Taylor**: [Ejemplo 7](./ejemplos/ejemplo-7.md) | [Código Python](./codigo/taylor-polinomio.py)
 
 ## Método de Interpolación de Lagrange
 
@@ -142,6 +164,89 @@ $$H(x) = y_0 + d_0(x-x_0) + \frac{P_1 - d_0}{h}(x-x_0)^2 + \frac{d_0 + d_1 - 2P_
 **Ejemplo práctico**: Consulta el [Ejemplo 3](./ejemplos/ejemplo-3.md) para ver una aplicación paso a paso del método de Hermite.
 
 
+## El Fenómeno de Runge
+
+> El fenómeno de Runge describe cómo los polinomios de grado alto, al interpolar sobre nodos equiespaciados, producen oscilaciones severas en los extremos del intervalo, arruinando la aproximación.
+
+**Intuición rota:** Podría pensarse que más puntos de interpolación = mejor ajuste. Pero Runge (1901) demostró lo contrario: a mayor grado, peor error en los bordes.
+
+**La campana de Runge (ejemplo clásico):**
+$$f(x) = \frac{1}{1 + 25x^2}, \quad x \in [-1, 1]$$
+
+Con nodos equidistantes, el polinomio oscila violentamente cerca de $x = \pm 1$, alejándose de la función real.
+
+**Soluciones:**
+- **Nodos de Chebyshev:** Distribuir los puntos con mayor densidad en los extremos (raíces de polinomios de Chebyshev). Estabiliza el polinomio global.
+- **Splines:** Dividir el dominio en subintervalos y usar polinomios de grado bajo en cada tramo. Elimina las oscilaciones por completo.
+
+
+## Método de Nodos de Chebyshev
+
+> **Definición:** La interpolación con nodos de Chebyshev es una técnica de aproximación polinómica que optimiza la ubicación de los puntos de evaluación para minimizar el error global. Es la solución matemática directa para suprimir las oscilaciones extremas en los bordes conocidas como el fenómeno de Runge.
+
+Dado un intervalo $[a, b]$ y una función $f(x)$ que se desea aproximar con un polinomio $P_n(x)$ de grado $n$, el error de interpolación en cualquier punto $x$ viene dado por:
+
+$$E(x) = \frac{f^{(n+1)}(\xi)}{(n+1)!} \prod_{i=0}^{n} (x - x_i)$$
+
+El objetivo es elegir los $n+1$ nodos $x_0, \ldots, x_n$ para minimizar $\max \left| \prod_{i=0}^{n} (x - x_i) \right|$ (aproximación minimax).
+
+### Polinomios de Chebyshev (primera especie)
+
+Los nodos óptimos son las raíces de los polinomios de Chebyshev $T_{n+1}(x)$, definidos en $[-1, 1]$ mediante:
+
+$$T_n(x) = \cos(n \arccos(x))$$
+
+**Propiedades clave:**
+- Mayor densidad de raíces cerca de los extremos ($\pm 1$) y menor en el centro.
+- El valor máximo absoluto de $T_n(x)$ en $[-1, 1]$ es exactamente $1$.
+- Al usarlas como nodos, el error se distribuye y oscila uniformemente.
+
+### Fórmula para los nodos
+
+Para $n+1$ puntos en $[-1, 1]$, las raíces de $T_{n+1}(x)$ son:
+
+$$x_k = \cos\left( \frac{2k + 1}{2(n+1)} \pi \right), \quad k = 0, 1, \ldots, n$$
+
+### Cambio de variable a un intervalo $[a, b]$
+
+$$t_k = \frac{a + b}{2} + \frac{b - a}{2} x_k$$
+
+**Ejemplo práctico**: Consulta el [Ejemplo 5](./ejemplos/ejemplo-5.md) para ver una aplicación paso a paso del método de Chebyshev.
+
+**Implementación**: Revisa el [código en Python](./codigo/chebyshev-polinomio.py) que implementa los nodos de Chebyshev y los compara con nodos equiespaciados.
+
+
+## Interpolación Segmentaria (A Trozos)
+
+> **Definición:** La interpolación segmentaria, también conocida como interpolación a trozos (*piecewise interpolation*), es una técnica de aproximación que consiste en dividir el intervalo global de los datos en varios subintervalos y ajustar un polinomio de grado bajo en cada uno de ellos. Es la solución estructural más directa para superar el fenómeno de Runge, garantizando que el error disminuya al añadir más puntos sin generar oscilaciones inestables.
+
+Dados $n+1$ puntos ordenados $x_0 < x_1 < \ldots < x_n$ y sus valores $f(x_i)$, se buscan $n$ polinomios $P_i(x)$ de grado bajo (usualmente 1, 2 o 3), tales que:
+
+$$P(x) = P_i(x) \quad \text{para } x \in [x_i, x_{i+1}], \quad i = 0, 1, \ldots, n-1$$
+
+Con la condición de interpolación y continuidad en los nodos:
+
+$$P_i(x_i) = f(x_i) \quad \text{y} \quad P_i(x_{i+1}) = f(x_{i+1})$$
+
+### Tipos de Interpolación Segmentaria
+
+**1. Lineal (Grado 1):** Conecta cada par de puntos con una recta. Garantiza continuidad de la función (clase $C^0$), pero produce "picos" en los nodos interiores.
+
+**2. Cuadrática (Grado 2):** Usa parábolas entre puntos. Garantiza continuidad de la función y su primera derivada (clase $C^1$), pero las segundas derivadas presentan saltos.
+
+La progresión lógica de esta necesidad de mayor suavidad da origen a la **Interpolación por Splines Cúbicos**, que garantiza continuidad hasta la segunda derivada (clase $C^2$).
+
+### Fórmula de la Interpolación Lineal a Trozos
+
+Para el caso más básico, la ecuación de la recta en $[x_i, x_{i+1}]$ es:
+
+$$P_i(x) = f(x_i) + \frac{f(x_{i+1}) - f(x_i)}{x_{i+1} - x_i} (x - x_i)$$
+
+**Ejemplo práctico**: Consulta el [Ejemplo 6](./ejemplos/ejemplo-6.md) para ver una aplicación paso a paso de la interpolación segmentaria lineal.
+
+**Implementación**: Revisa el [código en Python](./codigo/segmentaria-polinomio.py) que implementa la interpolación lineal a trozos.
+
+
 ## Método de Splines (Splines Cúbicos)
 
 > **Definición:** La interpolación por splines (o trazadores) es un método de aproximación polinómica a trozos que evita el fenómeno de Runge asociado a los polinomios de grado alto. En lugar de usar un único polinomio global para todos los nodos, emplea polinomios de grado menor (generalmente de tercer grado) entre cada par de puntos adyacentes, garantizando que la curva resultante sea suave y continua en sus derivadas.
@@ -180,5 +285,68 @@ Definiendo la distancia entre nodos como $h_j = x_{j+1} - x_j$, los coeficientes
 **Ejemplo práctico**: Consulta el [Ejemplo 4](./ejemplos/ejemplo-4.md) para ver una aplicación paso a paso del método de Splines.
 
 **Implementación**: Revisa el [código en Python](./codigo/spline-polinomio.py) que implementa el algoritmo de interpolación por Splines Cúbicos.
+
+
+## Aproximación mediante Polinomios de Taylor
+
+> **Definición:** A diferencia de los métodos de interpolación clásicos (Lagrange, Newton) que construyen un polinomio a partir de múltiples puntos dispersos, el método de Taylor es una técnica de **aproximación osculatoria local**. Utiliza la información de la función y sus derivadas en un único punto para construir un polinomio que se ajusta casi perfectamente a la curva en una vecindad cercana a dicho punto.
+
+Dada una función $f(x)$ al menos $n$ veces diferenciable en un punto base $x_0$, el objetivo es encontrar un polinomio $P_n(x)$ de grado $n$ que iguale la función y sus primeras $n$ derivadas en ese punto:
+
+$$P_n(x_0) = f(x_0), \quad P'_n(x_0) = f'(x_0), \quad \ldots, \quad P^{(n)}_n(x_0) = f^{(n)}(x_0)$$
+
+Al concentrar la información en un solo lugar, el polinomio será excelente cerca de $x_0$ pero su precisión disminuye al alejarse de él.
+
+### Fórmula del Polinomio de Taylor
+
+$$P_n(x) = \sum_{k=0}^{n} \frac{f^{(k)}(x_0)}{k!} (x - x_0)^k$$
+
+Desarrollada:
+
+$$P_n(x) = f(x_0) + f'(x_0)(x - x_0) + \frac{f''(x_0)}{2!}(x - x_0)^2 + \cdots + \frac{f^{(n)}(x_0)}{n!}(x - x_0)^n$$
+
+Cuando $x_0 = 0$, el polinomio recibe el nombre de **Polinomio de Maclaurin**.
+
+### Término del Error (Resto de Lagrange)
+
+El error de truncamiento al sustituir $f(x)$ por $P_n(x)$ es:
+
+$$R_n(x) = \frac{f^{(n+1)}(\xi)}{(n+1)!} (x - x_0)^{n+1}$$
+
+Donde $\xi$ es un número entre $x_0$ y $x$.
+
+**Ejemplo práctico**: Consulta el [Ejemplo 7](./ejemplos/ejemplo-7.md) para ver una aplicación paso a paso del polinomio de Taylor.
+
+**Implementación**: Revisa el [código en Python](./codigo/taylor-polinomio.py) que implementa el polinomio de Taylor y el cálculo del error.
+
+
+## Conclusiones: Criterios de Selección en el Cálculo Numérico
+
+El estudio de los métodos de aproximación e interpolación revela que **no existe un único método óptimo para todos los escenarios**, sino que la elección del algoritmo depende estrictamente de la naturaleza de los datos disponibles, los requisitos de suavidad y la estabilidad numérica deseada.
+
+### 1. El Dilema Global vs. Local (Fenómeno de Runge)
+
+- **La limitación global:** Los métodos de **Lagrange y Newton** son excelentes para un número reducido de puntos. Sin embargo, forzar un único polinomio de grado alto sobre nodos equiespaciados detona el **fenómeno de Runge**, generando oscilaciones salvajes en los extremos del intervalo.
+
+- **La solución por nodos (Chebyshev):** Si el diseñador o ingeniero tiene el control sobre dónde tomar las mediciones, los **Nodos de Chebyshev** optimizan la distribución eliminando por completo este problema basándose en una estrategia *minimax*.
+
+- **La solución por tramos (Segmentaria y Splines):** Si los puntos de los datos ya vienen predefinidos y son numerosos, la **interpolación segmentaria lineal** o los **splines cúbicos** representan la mejor opción industrial. Permiten mantener polinomios de grado bajo (evitando oscilaciones) mientras garantizan curvas continuas y suaves (clase $C^2$ en el caso cúbico).
+
+### 2. Multi-punto vs. Monopunto (Interpolación vs. Taylor)
+
+- **Aproximación multipunto:** Métodos como **Hermite** aprovechan no solo los valores de la función sino también sus pendientes para ajustar curvas con mayor fidelidad geométrica entre múltiples nodos.
+
+- **Aproximación monopunto (Taylor):** El método de **Taylor** opera bajo una lógica completamente inversa: no requiere conocer el comportamiento de la función en diferentes lugares, sino que explota al máximo las derivadas analíticas en un único punto central. Su precisión es imbatible localmente, pero disminuye drásticamente en el largo alcance.
+
+### Tabla de Criterio de Selección
+
+| Método | Información Requerida | Ventaja Principal | Desventaja / Riesgo | Uso Recomendado |
+|--------|----------------------|-------------------|---------------------|-----------------|
+| **Lagrange / Newton** | Múltiples puntos discretos $(x, y)$. | Algoritmo directo y construcción algebraica sencilla. | Inestabilidad extrema con muchos puntos (Runge). | Pocos puntos ($n \le 4$) o bases teóricas. |
+| **Nodos de Chebyshev** | Intervalo $[a,b]$ donde se *pueden* elegir los puntos. | Minimiza drásticamente el error máximo global. | Requiere poder calcular o medir en posiciones específicas. | Optimización de funciones matemáticas conocidas. |
+| **Hermite** | Puntos discretos $(x, y)$ y sus derivadas $y'$. | Mayor control geométrico y suavidad en los nodos. | Duplica el grado del polinomio y la complejidad de la tabla. | Diseño de curvas o trayectorias con pendientes conocidas. |
+| **Interpolación Segmentaria** | Múltiples puntos discretos $(x, y)$. | Construcción simple, continua y libre de oscilaciones de grado alto. | Presenta "picos" o quiebres abruptos en los nodos interiores. | Conexiones rápidas punto a punto donde la suavidad no es crítica. |
+| **Splines Cúbicos** | Múltiples puntos discretos (cualquier cantidad). | Curvatura óptima y perfectamente suave en todo el intervalo. | Requiere resolver un sistema tridiagonal de ecuaciones. | Gráficos computacionales, modelado de terrenos y analítica de datos. |
+| **Taylor** | Función y sus derivadas sucesivas en *un solo* punto $x_0$. | Excelente aproximación analítica local sin usar otros puntos. | El error crece exponencialmente al alejarse del centro $x_0$. | Análisis físico local, simplificación de funciones complejas. |
 
 
