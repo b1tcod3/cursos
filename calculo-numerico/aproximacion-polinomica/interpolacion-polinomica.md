@@ -65,7 +65,7 @@ Teóricamente el sistema tiene solución única ($\det(V) \neq 0$), pero numéri
 
 ## Método de Interpolación de Lagrange
 
-Este método en lugar de esolver un sistema de ecuaciones complicado, Lagrange propone armar el polinomio como una "combinación" de piezas más simples llamadas polinomios base($L_i$).
+Este método, en lugar de resolver un sistema de ecuaciones complicado, propone armar el polinomio como una "combinación" de piezas más simples llamadas polinomios base ($L_i$).
 
 > **Formulación:** Dado un conjunto de puntos $(x_0, y_0), (x_1, y_1), ..., (x_n, y_n)$, el polinomio de interpolación de Lagrange se define como:
 

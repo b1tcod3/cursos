@@ -37,7 +37,8 @@ Queda demostrado que no pueden existir dos polinomios distintos; el polinomio es
 
 Asumiendo que el polinomio tiene la forma canónica $P(x) = a_0 + a_1x + a_2x^2 + \dots + a_nx^n$, evaluar los $n+1$ puntos genera un sistema de ecuaciones lineales $Ax = b$:
 
-$$\begin{pmatrix}
+$$
+\begin{pmatrix}
 1 & x_0 & x_0^2 & \cdots & x_0^n \\
 1 & x_1 & x_1^2 & \cdots & x_1^n \\
 \vdots & \vdots & \vdots & \ddots & \vdots \\
@@ -49,7 +50,8 @@ a_0 \\ a_1 \\ \vdots \\ a_n
 =
 \begin{pmatrix}
 y_0 \\ y_1 \\ \vdots \\ y_n
-\end{pmatrix}$$
+\end{pmatrix}
+$$
 
 La matriz de coeficientes es la **Matriz de Vandermonde**. Su determinante es:
 
