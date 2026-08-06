@@ -83,8 +83,8 @@ def evaluar_polinomio(polinomio, x_valor):
 # --- EJECUCIÓN DEL EJEMPLO ---
 
 # Definimos los puntos conocidos (nodos)
-x_puntos = [0, 1, 2, 3]
-y_puntos = [-1, 6, 31, 18]
+x_puntos = [1, 0, -3]
+y_puntos = [2, 4, -2]
 
 print("Datos de entrada:")
 print(f"x: {x_puntos}")
@@ -101,8 +101,8 @@ for punto in [-1,-2, 4, 7]:
 
 # --- BLOQUE DE VISUALIZACIÓN GRÁFICA ---
 
-# Creamos 200 puntos entre 0 y 8 para dibujar una curva suave
-x_vals = np.linspace(0, 8, 200)
+# Creamos 200 puntos entre -4 y 2 para dibujar una curva suave
+x_vals = np.linspace(-4, 2, 200)
 
 # Evaluamos cada uno de esos 200 puntos en nuestro polinomio
 # Convertimos a float() porque matplotlib no entiende símbolos de SymPy
