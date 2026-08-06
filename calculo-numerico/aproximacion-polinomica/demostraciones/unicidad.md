@@ -46,8 +46,7 @@ $$
 \end{pmatrix}
 \begin{pmatrix}
 a_0 \\ a_1 \\ \vdots \\ a_n
-\end{pmatrix}
-=
+\end{pmatrix} =
 \begin{pmatrix}
 y_0 \\ y_1 \\ \vdots \\ y_n
 \end{pmatrix}
