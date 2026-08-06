@@ -1,6 +1,7 @@
 import sympy as sp
 import numpy as np
 import matplotlib.pyplot as plt
+from interpolacion_util import evaluar_por_tramos  # Utilidades compartidas
 
 def resolver_sistema_tridiagonal(h, a, tipo="natural", dy_extremos=None):
     """
@@ -87,17 +88,6 @@ def obtener_spline(x_points, y_points, tipo="natural", dy_extremos=None):
     return splines, x
 
 
-def evaluar_spline(splines, x_valor):
-    """
-    Evalúa el spline en un valor dado, seleccionando el polinomio adecuado.
-    """
-    x = sp.Symbol('x')
-    for xi, xf, S_j in splines:
-        if xi <= x_valor <= xf:
-            return float(S_j.subs(x, x_valor))
-    return None
-
-
 # --- EJECUCIÓN DEL EJEMPLO ---
 
 x_puntos = [0, 1, 2]
@@ -111,18 +101,18 @@ splines, x_var = obtener_spline(x_puntos, y_puntos, tipo="natural")
 
 print("\nVerificación en los nodos:")
 for i in range(len(x_puntos)):
-    val = evaluar_spline(splines, x_puntos[i])
+    val = evaluar_por_tramos(splines, x_puntos[i])
     print(f"S({x_puntos[i]}) = {val}")
 
 print("\nEvaluaciones intermedias:")
 for punto in [0.5, 1.5]:
-    val = evaluar_spline(splines, punto)
+    val = evaluar_por_tramos(splines, punto)
     print(f"S({punto}) = {val}")
 
 # --- BLOQUE DE VISUALIZACIÓN GRÁFICA ---
 
 x_vals_graf = np.linspace(0, 2, 300)
-y_vals_graf = [evaluar_spline(splines, x) for x in x_vals_graf]
+y_vals_graf = [evaluar_por_tramos(splines, x) for x in x_vals_graf]
 
 plt.figure(figsize=(10, 6))
 plt.plot(x_vals_graf, y_vals_graf, 'b-', label='Spline Cúbico Natural', linewidth=2)

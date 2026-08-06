@@ -1,6 +1,7 @@
 import sympy as sp
 import numpy as np
 import matplotlib.pyplot as plt
+from interpolacion_util import construir_polinomio_newton  # Utilidades compartidas
 
 
 def nodos_chebyshev(n, a=-1, b=1):
@@ -15,36 +16,6 @@ def nodos_chebyshev(n, a=-1, b=1):
     ])
     t_k = (a + b) / 2 + (b - a) / 2 * nodos
     return t_k
-
-
-def diferencias_divididas(x_points, y_points):
-    """
-    Tabla de diferencias divididas de Newton.
-    Retorna los coeficientes (diagonal superior).
-    """
-    n = len(x_points)
-    tabla = [[0.0 for _ in range(n)] for _ in range(n)]
-    for i in range(n):
-        tabla[i][0] = y_points[i]
-    for j in range(1, n):
-        for i in range(n - j):
-            tabla[i][j] = (tabla[i + 1][j - 1] - tabla[i][j - 1]) / (x_points[i + j] - x_points[i])
-    return [tabla[0][j] for j in range(n)]
-
-
-def polinomio_newton(x_points, y_points):
-    """
-    Construye el polinomio de Newton con diferencias divididas.
-    """
-    x = sp.Symbol('x')
-    coef = diferencias_divididas(x_points, y_points)
-    pol = coef[0]
-    for i in range(1, len(coef)):
-        termino = coef[i]
-        for j in range(i):
-            termino *= (x - x_points[j])
-        pol += termino
-    return sp.simplify(pol), x
 
 
 def funcion_runge(x):
@@ -75,8 +46,8 @@ print(f"  x: {np.round(x_cheb, 4)}")
 print(f"  y: {np.round(y_cheb, 4)}\n")
 
 # Construir polinomios con Newton
-p_equi, x_var = polinomio_newton(x_equi, y_equi)
-p_cheb, _ = polinomio_newton(x_cheb, y_cheb)
+p_equi, x_var = construir_polinomio_newton(x_equi, y_equi)
+p_cheb, _ = construir_polinomio_newton(x_cheb, y_cheb)
 
 print(f"Polinomio con nodos equiespaciados (grado {n}):")
 print(f"  P_equi(x) = {p_equi}\n")

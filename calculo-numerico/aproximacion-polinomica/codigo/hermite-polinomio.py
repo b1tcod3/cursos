@@ -1,6 +1,7 @@
 import sympy as sp
 import numpy as np
 import matplotlib.pyplot as plt
+from interpolacion_util import evaluar_polinomio, graficar_polinomio  # Utilidades compartidas
 
 def diferencias_divididas_hermite(x_vals, y_vals, dy_vals):
     """
@@ -81,13 +82,6 @@ def obtener_polinomio_hermite(x_puntos, y_puntos, dy_puntos):
     
     return sp.simplify(polinomio), x
 
-def evaluar_polinomio(polinomio, x_valor):
-    """
-    Evalúa el polinomio en un valor dado.
-    """
-    x = sp.Symbol('x')
-    return polinomio.subs(x, x_valor)
-
 # --- EJECUCIÓN DEL EJEMPLO ---
 
 # Mismos datos que Lagrange y Newton: (1,2), (0,4), (-3,-2)
@@ -111,18 +105,4 @@ for i in range(len(x_puntos)):
 
 # --- BLOQUE DE VISUALIZACIÓN GRÁFICA ---
 
-x_vals_graf = np.linspace(-4, 2, 200)
-y_vals_graf = [float(evaluar_polinomio(polinomio, x)) for x in x_vals_graf]
-
-plt.figure(figsize=(10, 6))
-plt.plot(x_vals_graf, y_vals_graf, 'b-', label=f'H(x) = {polinomio}', linewidth=2)
-plt.plot(x_puntos, y_puntos, 'ro', label='Puntos conocidos', markersize=10)
-
-plt.xlabel('x')
-plt.ylabel('y')
-plt.title('Interpolación de Hermite')
-plt.legend()
-plt.grid(True)
-plt.axhline(y=0, color='k', linestyle='-', alpha=0.3)
-plt.axvline(x=0, color='k', linestyle='-', alpha=0.3)
-plt.show()
+graficar_polinomio(polinomio, x_puntos, y_puntos, 'Interpolación de Hermite', etiqueta='H')

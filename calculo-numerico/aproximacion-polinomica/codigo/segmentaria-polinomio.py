@@ -1,6 +1,7 @@
 import sympy as sp
 import numpy as np
 import matplotlib.pyplot as plt
+from interpolacion_util import evaluar_por_tramos  # Utilidades compartidas
 
 
 def interpolacion_segmentaria_lineal(x_points, y_points):
@@ -26,17 +27,6 @@ def interpolacion_segmentaria_lineal(x_points, y_points):
     return tramos, x
 
 
-def evaluar_segmentaria(tramos, x_valor):
-    """
-    Evalúa la interpolación segmentaria en un valor dado.
-    """
-    x = sp.Symbol('x')
-    for xi, xf, P_i in tramos:
-        if xi <= x_valor <= xf:
-            return float(P_i.subs(x, x_valor))
-    return None
-
-
 # --- EJECUCIÓN DEL EJEMPLO ---
 
 x_puntos = [0, 2, 4]
@@ -50,18 +40,18 @@ tramos, x_var = interpolacion_segmentaria_lineal(x_puntos, y_puntos)
 
 print("\nVerificación en los nodos:")
 for i in range(len(x_puntos)):
-    val = evaluar_segmentaria(tramos, x_puntos[i])
+    val = evaluar_por_tramos(tramos, x_puntos[i])
     print(f"P({x_puntos[i]}) = {val}")
 
 print("\nEvaluaciones intermedias:")
 for punto in [1, 3]:
-    val = evaluar_segmentaria(tramos, punto)
+    val = evaluar_por_tramos(tramos, punto)
     print(f"P({punto}) = {val}")
 
 # --- VISUALIZACIÓN ---
 
 x_graf = np.linspace(0, 4, 300)
-y_graf = [evaluar_segmentaria(tramos, x) for x in x_graf]
+y_graf = [evaluar_por_tramos(tramos, x) for x in x_graf]
 
 plt.figure(figsize=(10, 6))
 plt.plot(x_graf, y_graf, 'b-', label='Interpolación Segmentaria Lineal', linewidth=2)

@@ -1,6 +1,7 @@
 import sympy as sp
 import numpy as np
 import matplotlib.pyplot as plt
+from interpolacion_util import evaluar_polinomio  # Utilidades compartidas
 
 
 def polinomio_taylor(funcion, x0, n):
@@ -59,15 +60,15 @@ print("Función: f(x) = eˣ")
 print(f"Punto base: x₀ = {x0}")
 print(f"Grado del polinomio: n = {n}\n")
 
-P, x_var = polinomio_taylor(f, x0, n)
+P, _ = polinomio_taylor(f, x0, n)
 
 print(f"\nP_{n}(x) = {P}")
 print()
 
 # Evaluación y comparación
 x_eval = 0.5
-aprox = float(P.subs(x_var, x_eval))
-real = float(f.subs(x_var, x_eval))
+aprox = float(evaluar_polinomio(P, x_eval))
+real = float(evaluar_polinomio(f, x_eval))
 error_abs = abs(real - aprox)
 error_pct = error_abs / real * 100
 
@@ -84,8 +85,8 @@ print(f"\nResto de Lagrange: R_{n}(x) = {resto}")
 # --- VISUALIZACIÓN ---
 
 x_graf = np.linspace(-1, 2, 400)
-f_real = [float(f.subs(x_var, xv)) for xv in x_graf]
-f_aprox = [float(P.subs(x_var, xv)) for xv in x_graf]
+f_real = [float(evaluar_polinomio(f, xv)) for xv in x_graf]
+f_aprox = [float(evaluar_polinomio(P, xv)) for xv in x_graf]
 f_error = [abs(real_i - aprox_i) for real_i, aprox_i in zip(f_real, f_aprox)]
 
 fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5))

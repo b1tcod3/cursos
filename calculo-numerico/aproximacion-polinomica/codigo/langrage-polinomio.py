@@ -21,6 +21,7 @@ PROPIEDADES:
 import sympy as sp  # Biblioteca para cálculo simbólico (maneja la 'x' como variable)
 import numpy as np  # Para crear arreglos numéricos y rangos
 import matplotlib.pyplot as plt  # Para generar la gráfica final
+from interpolacion_util import evaluar_polinomio, graficar_polinomio  # Utilidades compartidas
 
 def obtener_polinomio_lagrange(x_points, y_points):
     """
@@ -72,14 +73,6 @@ def obtener_polinomio_lagrange(x_points, y_points):
     # Retornamos el polinomio limpio y la variable simbólica para usarla después
     return sp.simplify(polinomio), x
 
-def evaluar_polinomio(polinomio, x_valor):
-    """
-    Toma el polinomio simbólico y reemplaza la 'x' por un valor real.
-    """
-    x = sp.Symbol('x')
-    # .subs() es 'substitute': cambia x por el valor deseado
-    return polinomio.subs(x, x_valor)
-
 # --- EJECUCIÓN DEL EJEMPLO ---
 
 # Definimos los puntos conocidos (nodos)
@@ -101,25 +94,4 @@ for punto in [-1,-2, 4, 7]:
 
 # --- BLOQUE DE VISUALIZACIÓN GRÁFICA ---
 
-# Creamos 200 puntos entre -4 y 2 para dibujar una curva suave
-x_vals = np.linspace(-4, 2, 200)
-
-# Evaluamos cada uno de esos 200 puntos en nuestro polinomio
-# Convertimos a float() porque matplotlib no entiende símbolos de SymPy
-y_vals = [float(evaluar_polinomio(polinomio, x)) for x in x_vals]
-
-plt.figure(figsize=(10, 6))
-# Dibujamos la línea azul del polinomio interpolado
-plt.plot(x_vals, y_vals, 'b-', label=f'P(x) = {polinomio}', linewidth=2)
-# Dibujamos los puntos originales como puntos rojos
-plt.plot(x_puntos, y_puntos, 'ro', label='Puntos conocidos', markersize=10)
-
-plt.xlabel('x')
-plt.ylabel('y')
-plt.title('Polinomio de Interpolación de Lagrange')
-plt.legend()
-plt.grid(True)
-# Dibujamos los ejes X e Y para referencia
-plt.axhline(y=0, color='k', linestyle='-', alpha=0.3)
-plt.axvline(x=0, color='k', linestyle='-', alpha=0.3)
-plt.show()
+graficar_polinomio(polinomio, x_puntos, y_puntos, 'Polinomio de Interpolación de Lagrange')
