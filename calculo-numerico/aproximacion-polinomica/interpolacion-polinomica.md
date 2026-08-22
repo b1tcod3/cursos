@@ -4,7 +4,7 @@ La interpolación polinómica es una herramienta fundamental en el análisis num
 
 > **Nota sobre las figuras:** El cálculo numérico requiere intuición geométrica. Las imágenes de este documento son gráficas estáticas generadas con Matplotlib a partir de las implementaciones en Python; pueden regenerarse ejecutando [`codigo/generar_graficas.py`](./codigo/generar_graficas.py). Ver visualmente la campana de Runge oscilando frente a la curva suave de los Splines vale más que mil ecuaciones.
 
-> **Definición:**: Es una técnica que consiste en encontrar un polinomio que pase exactamente por un conjunto de puntos dados. Dado un conjunto de $n+1$ puntos, existe un único polinomio de grado *n* que satisface todas las condiciones de interpolación, resultado garantizado por el determinante de Vandermonde.
+> **Definición:**: Es una técnica que consiste en encontrar un polinomio que pase exactamente por un conjunto de puntos dados. Dado un conjunto de $n+1$ puntos, existe un único polinomio de grado *a lo sumo* $n$ que satisface todas las condiciones de interpolación, resultado garantizado por el determinante de Vandermonde.
 
 ## El Polinomio de Interpolación: Concepto General
 
@@ -15,7 +15,7 @@ $$P(x_i) = y_i \quad \text{para todo } i = 0, 1, \dots, n$$
 **Características clave:**
 
 - **Ajuste exacto:** A diferencia de la regresión por mínimos cuadrados, la curva pasa físicamente por todos los puntos dados, sin margen de error en los nodos.
-- **Límite de grado:** $n+1$ puntos requieren un polinomio de grado máximo $n$ (2 puntos $\to$ recta, 3 $\to$ parábola, etc.).
+- **Límite de grado:** $n+1$ puntos garantizan un polinomio de grado *a lo sumo* $n$ (2 puntos $\to$ recta, 3 $\to$ parábola, etc.). Ojo con el matiz: el teorema fija un **tope**, no una igualdad. Si los datos tienen estructura simple, el grado real baja sin pedirlo nadie — tres puntos colineales producen una recta (grado 1), no una parábola, porque al resolver el sistema el coeficiente de $x^2$ resulta ser exactamente 0. El grado $n$ solo aparece cuando los puntos realmente lo exigen.
 - **Independencia del método:** Lagrange, Newton y Vandermonde no generan polinomios diferentes, sino caminos algorítmicos distintos para calcular el mismo y único polinomio $P(x)$.
 
 ## Teorema de Existencia y Unicidad de la Interpolación Polinómica
@@ -247,7 +247,17 @@ La tabla se construye repitiendo cada nodo y colocando las derivadas según corr
 | $x_1$ | $y_1$ | $P_1$ | $(P_1 - d_0)/h$ | |
 | $x_1$ | $y_1$ | $d_1$ | $(d_1 - P_1)/h$ | $(d_0 + d_1 - 2P_1)/h^2$ |
 
-Donde $P_1 = \frac{y_1 - y_0}{h}$ y $h = x_1 - x_0$.
+Donde $h = x_1 - x_0$ es la distancia entre nodos.
+
+> **⚠ $P_1$ es un paso intermedio, no un dato:** antes de poder llenar las columnas de orden 2 y 3 hay que calcular manualmente dos cantidades auxiliares. Primero la distancia entre nodos, $h = x_1 - x_0$, y luego la pendiente simple entre ellos:
+>
+> $$P_1 = f[x_0, x_1] = \frac{y_1 - y_0}{x_1 - x_0} = \frac{y_1 - y_0}{h}$$
+>
+> Solo con esos dos valores a mano se pueden completar las celdas superiores de la tabla. Todas usan el **mismo denominador** $h$ (o su cuadrado), porque la regla general de diferencias divididas siempre divide por la resta de los nodos extremos que abarca cada celda, y aquí todos los extremos son $x_0$ o $x_1$:
+
+- Celda orden 2: $(P_1 - d_0)/h$ — combina $f[x_0, x_0] = d_0$ con $f[x_0, x_1] = P_1$; extremos $x_1$ y $x_0$ → denominador $h$.
+- Celda orden 2: $(d_1 - P_1)/h$ — combina $f[x_0, x_1] = P_1$ con $f[x_1, x_1] = d_1$; extremos $x_1$ y $x_0$ → denominador $h$.
+- Celda orden 3: $\dfrac{d_0 + d_1 - 2P_1}{h^2}$ — combina las dos anteriores; los dos niveles de resta acumulan $h \cdot h$.
 
 ### Fórmula del polinomio de Hermite
 
