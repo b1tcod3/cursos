@@ -101,7 +101,7 @@ $$f[x_0, ..., x_n] = \frac{f[x_1, ..., x_n] - f[x_0, ..., x_{n-1}]}{x_n - x_0}$$
 
 con la condición inicial $f[x_k] = f(x_k)$.
 
-Este método es especialmente útil cuando se agregan nuevos puntos de interpolación, ya que permite actualizar el polinomio sin necesidad de recalcular todo desde cero.
+Este método es especialmente útil cuando se agregan nuevos puntos de interpolación, ya que permite actualizar el polinomio sin necesidad de recalcular todo desde cero. En términos computacionales: construir la tabla completa cuesta $O(n^2)$ operaciones, pero incorporar un punto nuevo solo requiere $O(n)$.
 
 ### Tabla de Diferencias Divididas
 
@@ -317,7 +317,7 @@ $$S_j(x) = a_j + b_j(x - x_j) + c_j(x - x_j)^2 + d_j(x - x_j)^3$$
 Definiendo la distancia entre nodos como $h_j = x_{j+1} - x_j$, los coeficientes se determinan así:
 
 1. $a_j = f(x_j)$
-2. Los coeficientes $c_j$ se calculan resolviendo un **sistema tridiagonal** para los nodos interiores.
+2. Los coeficientes $c_j$ se calculan resolviendo un **sistema tridiagonal** para los nodos interiores. Al ser tridiagonal, el sistema se resuelve en tiempo lineal $O(n)$ mediante el [algoritmo de Thomas](#análisis-de-complejidad-algorítmica), frente al costo cúbico $O(n^3)$ de la eliminación gaussiana para sistemas densos.
 3. $b_j = \frac{f(x_{j+1}) - f(x_j)}{h_j} - \frac{h_j(2c_j + c_{j+1})}{3}$
 4. $d_j = \frac{c_{j+1} - c_j}{3h_j}$
 
@@ -363,6 +363,54 @@ Donde $\xi$ es un número entre $x_0$ y $x$.
 **Ejemplo práctico**: Consulta el [Ejemplo 7](./ejemplos/ejemplo-7.md) para ver una aplicación paso a paso del polinomio de Taylor.
 
 **Implementación**: Revisa el [código en Python](./codigo/taylor-polinomio.py) que implementa el polinomio de Taylor y el cálculo del error.
+
+
+## Análisis de Complejidad Algorítmica
+
+> **Definición:** La notación **Big O** —$O(f(n))$— describe cómo crece el costo computacional de un algoritmo cuando aumenta el tamaño de la entrada $n$ (aquí, el número de nodos o el grado del polinomio), ignorando constantes y términos de menor orden. Es el puente entre la matemática de cada método y su viabilidad como software.
+
+Como cada método produce el mismo polinomio único garantizado por el teorema de existencia y unicidad, la complejidad algorítmica es **el único criterio técnico objetivo** para elegir entre ellos: matemáticamente equivalentes, computacionalmente mundos aparte.
+
+### Costos por método
+
+- **Vandermonde:** plantear la matriz cuesta $O(n^2)$ y resolver el sistema denso por eliminación gaussiana $O(n^3)$, con memoria $O(n^2)$. Peor combinación posible: caro *y* numéricamente inestable. Nunca se usa.
+
+- **Lagrange:** no construye nada previamente, pero evaluar los $n+1$ polinomios base $L_i(x)$ para un solo punto cuesta $O(n^2)$ operaciones. La forma baricéntrica precalcula los pesos en $O(n^2)$ una sola vez y baja cada evaluación a $O(n)$.
+
+- **Newton:** la tabla completa de diferencias divididas tiene $\frac{n(n+1)}{2}$ celdas, así que construirla cuesta $O(n^2)$; evaluar luego mediante la forma anidada (esquema tipo Horner) cuesta solo $O(n)$ por punto. Su ventaja estrella: agregar un punto nuevo requiere completar una diagonal de la tabla, es decir $O(n)$, sin recalcular las columnas existentes.
+
+- **Hermite:** idéntico a Newton sobre una tabla de $m = 2n+2$ filas (valores + derivadas), por lo que sigue siendo $O(m^2) = O(n^2)$ en construcción y $O(n)$ en evaluación.
+
+- **Chebyshev:** generar los nodos con la fórmula coseno es $O(n)$; después paga exactamente lo mismo que Newton ($O(n^2)$ construcción, $O(n)$ evaluación). La elección inteligente de nodos es gratis.
+
+- **Segmentaria lineal:** calcular las pendientes de los $n$ tramos es $O(n)$; localizar el subintervalo de un punto dado con búsqueda binaria cuesta $O(\log n)$, y añadir un dato al final es $O(1)$.
+
+- **Splines cúbicos:** ensamblar el sistema tridiagonal es $O(n)$ y resolverlo también $O(n)$ gracias al **algoritmo de Thomas**, frente al $O(n^3)$ que costaría tratarlo como sistema denso. Esta eficiencia lineal es la razón por la que los splines escalan a millones de puntos en gráficos por computadora y análisis de señales.
+
+- **Taylor:** una vez conocidas las derivadas en $x_0$, el polinomio se evalúa con Horner en $O(n)$; el costo dominante depende de cuán barato sea obtener $f^{(k)}(x_0)$ analíticamente.
+
+### El algoritmo de Thomas
+
+El sistema tridiagonal de los splines solo conecta cada incógnita con sus dos vecinas:
+
+$$\alpha_i\, c_{i-1} + \beta_i\, c_i + \gamma_i\, c_{i+1} = d_i$$
+
+Eliminar la subdiagonal hacia adelante y sustituir hacia atrás requiere un número constante de operaciones por fila, unas $\sim 8n$ en total: tiempo lineal $O(n)$ y memoria $O(n)$. Es el mismo principio de sparsidad que explota todo solver moderno de elementos finitos.
+
+### Tabla comparativa de complejidades
+
+| Método | Construcción | Evaluación de un punto | Agregar información nueva | Memoria |
+|--------|--------------|------------------------|---------------------------|---------|
+| **Vandermonde** | $O(n^3)$ | $O(n)$ | $O(n^3)$ (reresolver todo) | $O(n^2)$ |
+| **Lagrange** | — | $O(n^2)$ | $O(n^2)$ | $O(n)$ |
+| **Newton** | $O(n^2)$ | $O(n)$ | $O(n)$ ⭐ | $O(n)$ |
+| **Hermite** | $O(n^2)$ | $O(n)$ | $O(n)$ | $O(n)$ |
+| **Chebyshev** | $O(n)$ nodos + $O(n^2)$ Newton | $O(n)$ | reconstruir | $O(n)$ |
+| **Segmentaria lineal** | $O(n)$ | $O(\log n)$ | $O(1)$ ⭐ | $O(n)$ |
+| **Splines cúbicos** | $O(n)$ (Thomas) ⭐ | $O(\log n)$ | $O(n)$ | $O(n)$ |
+| **Taylor** | según $f$ | $O(n)$ (Horner) | grado nuevo → recalcular | $O(1)$ |
+
+> **Lectura de la tabla:** si los datos llegan de forma incremental (telemetría, sensores en vivo), Newton gana por su actualización $O(n)$. Si el conjunto es grande y fijo, los splines dominan: construcción lineal $O(n)$, curvas suaves $C^2$ y sin riesgo de Runge. Y si además el método elegido fuera a empeorar con más datos (Runge), pagar más cómputo compraría peor respuesta: la complejidad y la estabilidad deben analizarse juntas.
 
 
 ## Conclusiones: Criterios de Selección en el Cálculo Numérico
