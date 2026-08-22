@@ -83,6 +83,28 @@ Cada $L_i(x)$ es un polinomio de grado $n$ con las siguientes propiedades:
 
 En resumen, cada polinomio de base $L_i(x)$ es igual a 1 en $x_i$ y 0 en los demás puntos para $i \neq j$, lo que garantiza que el polinomio de interpolación pase por todos los puntos dados.
 
+La formulación anterior se traduce en código casi literal: el bucle interno construye cada $L_i(x)$ como producto, y el externo acumula la suma ponderada $\sum y_i L_i(x)$:
+
+```python
+def obtener_polinomio_lagrange(x_points, y_points):
+    x = sp.Symbol('x')
+    n = len(x_points)
+    polinomio = 0
+
+    # Bucle externo: recorre cada punto i para construir su base L_i(x)
+    for i in range(n):
+        L_i = 1
+
+        # Bucle interno: producto (x - x_j) / (x_i - x_j) para todo j != i
+        for j in range(n):
+            if j != i:
+                L_i *= (x - x_points[j]) / (x_points[i] - x_points[j])
+
+        polinomio += y_points[i] * L_i     # suma y_i * L_i(x)
+
+    return sp.simplify(polinomio), x
+```
+
 **Ejemplo práctico**: Consulta el [Ejemplo 1](./ejemplos/ejemplo-1.md) para ver una aplicación paso a paso del método de Lagrange.
 
 **Implementación**: Revisa el [código en Python](./codigo/langrage-polinomio.py) que implementa el algoritmo de interpolación de Lagrange.
@@ -131,6 +153,27 @@ La fórmula general es:
 
 $$f[x_i, ..., x_{i+k}] = \frac{f[x_{i+1}, ..., x_{i+k}] - f[x_i, ..., x_{i+k-1}]}{x_{i+k} - x_i}$$
 
+La fórmula general es exactamente el doble bucle que llena la tabla: la columna $j$ se calcula combinando dos celdas vecinas de la columna $j-1$, donde `tabla[i][j]` almacena $f[x_i, x_{i+1}, \dots, x_{i+j}]$:
+
+```python
+def tabla_diferencias_divididas(x_points, y_points):
+    n = len(x_points)
+    tabla = [[0.0 for _ in range(n)] for _ in range(n)]
+
+    for i in range(n):
+        tabla[i][0] = y_points[i]          # nivel 0: f[x_i] = f(x_i)
+
+    # Cada celda combina dos vecinas de la columna anterior
+    for j in range(1, n):                  # orden j de la diferencia
+        for i in range(n - j):             # fila i de la tabla
+            tabla[i][j] = (
+                (tabla[i + 1][j - 1] - tabla[i][j - 1])
+                / (x_points[i + j] - x_points[i])
+            )
+
+    return tabla
+```
+
 **Ejemplo práctico**: Consulta el [Ejemplo 2](./ejemplos/ejemplo-2.md) para ver una aplicación paso a paso del método de Newton.
 
 **Implementación**: Revisa el [código en Python](./codigo/newton-polinomio.py) que implementa el algoritmo de interpolación de Newton.
@@ -165,6 +208,33 @@ $$f[x_0, x_1, \ldots, x_k] = \frac{f[x_1, \ldots, x_k] - f[x_0, \ldots, x_{k-1}]
 - Cuando los nodos son idénticos: $f[x_i, x_i] = f'(x_i)$
 - Para tres nodos repetidos: $f[x_i, x_i, x_i] = \frac{f''(x_i)}{2!}$
 - En general: $f[x_i, x_i, \ldots, x_i] = \frac{f^{(j)}(x_i)}{j!}$ donde $j$ es el número de repeticiones menos 1
+
+En código, la tabla de Hermite es el mismo doble bucle de Newton con una sola adición: cuando los extremos coinciden ($x_k = x_0$), la celda toma la derivada en lugar de dividir entre cero:
+
+```python
+def diferencias_divididas_hermite(x_vals, y_vals, dy_vals):
+    """
+    Tabla sobre los nodos repetidos z_2i = z_2i+1 = x_i.
+    dy_vals[i] = f'(x_i) resuelve las columnas con nodos idénticos.
+    """
+    n = len(x_vals)
+    tabla = [[0 for _ in range(n)] for _ in range(n)]
+
+    for i in range(n):
+        tabla[i][0] = y_vals[i]
+
+    for j in range(1, n):
+        for i in range(n - j):
+            if x_vals[i + j] == x_vals[i]:
+                tabla[i][j] = dy_vals[i]   # f[..., x_i, x_i] = f'(x_i)
+            else:
+                tabla[i][j] = (
+                    (tabla[i + 1][j - 1] - tabla[i][j - 1])
+                    / (x_vals[i + j] - x_vals[i])
+                )
+
+    return tabla
+```
 
 ### Tabla de diferencias divididas para Hermite
 
@@ -240,6 +310,18 @@ Para $n+1$ puntos en $[-1, 1]$, las raíces de $T_{n+1}(x)$ son:
 
 $$x_k = \cos\left( \frac{2k + 1}{2(n+1)} \pi \right), \quad k = 0, 1, \ldots, n$$
 
+La fórmula de los nodos cabe en una sola comprensión de lista; el cambio de variable al intervalo $[a, b]$ es una transformación afín posterior:
+
+```python
+def nodos_chebyshev(n, a=-1, b=1):
+    """Genera n+1 nodos de Chebyshev en [a, b]."""
+    nodos = np.array([
+        np.cos((2 * k + 1) * np.pi / (2 * (n + 1)))   # raíces de T_{n+1}
+        for k in range(n + 1)
+    ])
+    return (a + b) / 2 + (b - a) / 2 * nodos           # t_k en [a, b]
+```
+
 ### Cambio de variable a un intervalo $[a, b]$
 
 $$t_k = \frac{a + b}{2} + \frac{b - a}{2} x_k$$
@@ -277,6 +359,16 @@ La progresión lógica de esta necesidad de mayor suavidad da origen a la **Inte
 Para el caso más básico, la ecuación de la recta en $[x_i, x_{i+1}]$ es:
 
 $$P_i(x) = f(x_i) + \frac{f(x_{i+1}) - f(x_i)}{x_{i+1} - x_i} (x - x_i)$$
+
+Cada tramo es una única línea de código: calcular la pendiente del segmento y desplazar la recta al nodo izquierdo:
+
+```python
+for i in range(n):
+    pendiente = (y_points[i + 1] - y_points[i]) / (x_points[i + 1] - x_points[i])
+    P_i = y_points[i] + pendiente * (x - x_points[i])
+
+    tramos.append((x_points[i], x_points[i + 1], P_i))  # tramo válido en [x_i, x_{i+1}]
+```
 
 ![Segmentaria lineal vs Spline cúbico](./imagenes/segmentaria-vs-spline.png)
 *Figura 3: La interpolación lineal a trozos (clase $C^0$) produce picos visibles en los nodos; el spline cúbico (clase $C^2$) conecta los mismos puntos con curvatura continua.*
@@ -321,6 +413,25 @@ Definiendo la distancia entre nodos como $h_j = x_{j+1} - x_j$, los coeficientes
 3. $b_j = \frac{f(x_{j+1}) - f(x_j)}{h_j} - \frac{h_j(2c_j + c_{j+1})}{3}$
 4. $d_j = \frac{c_{j+1} - c_j}{3h_j}$
 
+El corazón del método es el ensamblaje del sistema tridiagonal para los $c_j$: cada fila conecta tres curvaturas vecinas, y una sola llamada resuelve el sistema:
+
+```python
+sistema = np.zeros((n - 1, n - 1))
+rhs = np.zeros(n - 1)
+
+for i in range(1, n):
+    # lado derecho: 3 * (pendiente derecha - pendiente izquierda)
+    rhs[i - 1] = 3 * ((a[i + 1] - a[i]) / h[i] - (a[i] - a[i - 1]) / h[i - 1])
+
+    sistema[i - 1, i - 1] = 2 * (h[i - 1] + h[i])   # diagonal principal
+    if i > 1:
+        sistema[i - 1, i - 2] = h[i - 1]            # subdiagonal
+    if i < n - 1:
+        sistema[i - 1, i] = h[i]                    # superdiagonal
+
+c_int = np.linalg.solve(sistema, rhs)   # en producción: algoritmo de Thomas, O(n)
+```
+
 ![Spline cúbico vs polinomio global](./imagenes/spline-vs-global.png)
 *Figura 4: Sobre los mismos 12 nodos de la campana de Runge, el polinomio global oscila salvajemente mientras el spline cúbico natural sigue la función con suavidad (error máximo menor a 0.01).*
 
@@ -346,6 +457,22 @@ $$P_n(x) = \sum_{k=0}^{n} \frac{f^{(k)}(x_0)}{k!} (x - x_0)^k$$
 Desarrollada:
 
 $$P_n(x) = f(x_0) + f'(x_0)(x - x_0) + \frac{f''(x_0)}{2!}(x - x_0)^2 + \cdots + \frac{f^{(n)}(x_0)}{n!}(x - x_0)^n$$
+
+El bucle acumula los términos mientras deriva sucesivamente la función; cada iteración produce el término $k$-ésimo de la suma:
+
+```python
+x = sp.Symbol('x')
+P = 0
+f_k = funcion
+
+for k in range(n + 1):
+    if k > 0:
+        f_k = sp.diff(f_k, x)                    # derivada sucesiva f^(k)(x)
+
+    derivada_en_x0 = float(f_k.subs(x, x0))      # evaluación en el punto base
+
+    P += derivada_en_x0 / sp.factorial(k) * (x - x0)**k   # término k-ésimo
+```
 
 Cuando $x_0 = 0$, el polinomio recibe el nombre de **Polinomio de Maclaurin**.
 
