@@ -102,11 +102,71 @@ La imagen muestra la misma integral aproximada con una recta (trapecio) y con un
 
 Aplicar una sola vez el trapecio a $[0,1]$ produce un error de $6.3\times 10^{-2}$: inaceptable. La estrategia ganadora consiste en **partir $[a,b]$ en $n$ subintervalos pequeños** y aplicar la regla simple en cada trozo. Al reducir $h$, el error colapsa según el orden del método.
 
-**Trapecio compuesto** con $n$ subintervalos ($h = \frac{b-a}{n}$):
+Este apartado es el puente final entre la teoría matemática y el código que escribirás: la idea conceptual de sumar trapecios se simplifica hasta convertirse en una fórmula elegante y fácil de programar.
+
+### De la suma de trapecios a la fórmula compacta
+
+Como es norma en integración numérica, asumimos que **todos los trapecios tienen el mismo ancho $h$** ($h = \frac{b-a}{n}$). Si sumamos las áreas de los trapecios sucesivos (Ecuación 6.15 del texto guía):
+
+$$\text{Área} = h\left(\frac{f(x_0) + f(x_1)}{2}\right) + h\left(\frac{f(x_1) + f(x_2)}{2}\right) + h\left(\frac{f(x_2) + f(x_3)}{2}\right) \dots$$
+
+Si observas de cerca esta suma, notarás un patrón interesante:
+
+* El primer punto $f(x_0)$ se usa una vez (en el primer trapecio).
+* El segundo punto $f(x_1)$ se usa **dos veces** (como lado derecho del primer trapecio y lado izquierdo del segundo).
+* El punto $f(x_2)$ también se usa dos veces, y así se repite para todos los puntos interiores.
+* El último punto $f(x_n)$ se usa solo una vez (en el último trapecio).
+
+Factorizando $\frac{h}{2}$ de todos los términos (Ecuación 6.16):
+
+$$\int_{a}^{b} f(x)\,dx \approx \frac{h}{2} \Big[ f(x_0) + 2f(x_1) + 2f(x_2) + \dots + 2f(x_{n-1}) + f(x_n) \Big]$$
+
+Y en la versión final compacta (Ecuación 6.17), perfecta para un bucle `for`:
+
+$$\int_{a}^{b} f(x)\,dx \approx h \Big[ \tfrac{1}{2}f(x_0) + \sum_{i=1}^{n-1} f(x_i) + \tfrac{1}{2}f(x_n) \Big]$$
+
+Multiplicas todos los puntos interiores por 1, sumas la mitad del primero y del último, y multiplicas todo por el ancho de paso $h$. Añadiendo la teoría del error, la regla completa queda:
 
 $$T_n = \frac{h}{2}\Big[f(x_0) + 2\sum_{i=1}^{n-1} f(x_i) + f(x_n)\Big], \qquad E = -\frac{(b-a)}{12}\,h^2 f''(\xi)$$
 
 Los nodos interiores pesan doble porque participan en dos trapecios vecinos.
+
+### Un poco de vocabulario técnico (*Composite Integration Rules*)
+
+Conviene precisar cómo nombran los matemáticos estas variantes:
+
+* **"Regla del Trapecio" (*The Trapezoidal Rule*):** técnicamente significa usar **un solo trapecio** gigante para aproximar toda la curva desde $a$ hasta $b$, lo que suele ser muy inexacto.
+* **"Regla del Trapecio Compuesta" (*The Composite Trapezoidal Rule*):** lo que acabamos de deducir: dividir el área en $n$ trapecios pequeños y sumarlos.
+
+Aunque "compuesta" es el término correcto, en la práctica (y en el código) la mayoría simplemente dice "regla del trapecio", dando por supuesto que se usarán múltiples intervalos.
+
+### ¿Cómo se ve esta fórmula en Python?
+
+La Ecuación 6.17 se traduce casi directamente a código. La implementación con un bucle estándar queda así:
+
+```python
+def trapecio_compuesto(f, a, b, n):
+    """
+    Aproxima la integral de f(x) desde a hasta b usando n trapecios.
+    """
+    # 1. Calculamos el ancho de cada trapecio (h)
+    h = (b - a) / n
+
+    # 2. Sumamos la mitad del primer y último término
+    # Esto corresponde a: 0.5*f(x_0) + 0.5*f(x_n)
+    suma = 0.5 * f(a) + 0.5 * f(b)
+
+    # 3. Sumamos todos los puntos interiores
+    # Esto corresponde al símbolo de sumatoria (Sigma) en la fórmula 6.17
+    for i in range(1, n):
+        x_i = a + i * h
+        suma += f(x_i)
+
+    # 4. Multiplicamos la suma total por h
+    return h * suma
+```
+
+La versión completa —con impresión paso a paso del proceso, comparación contra el valor exacto y visualización gráfica— está en [`codigo/trapecio.py`](./codigo/trapecio.py).
 
 **Simpson 1/3 compuesto** (requiere $n$ **par**):
 
