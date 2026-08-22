@@ -2,6 +2,8 @@
 
 La interpolación polinómica es una herramienta fundamental en el análisis numérico, ya que permite aproximar funciones complejas o datos discretos mediante una expresión algebraica manejable: el polinomio.
 
+> **Nota sobre las figuras:** El cálculo numérico requiere intuición geométrica. Las imágenes de este documento son gráficas estáticas generadas con Matplotlib a partir de las implementaciones en Python; pueden regenerarse ejecutando [`codigo/generar_graficas.py`](./codigo/generar_graficas.py). Ver visualmente la campana de Runge oscilando frente a la curva suave de los Splines vale más que mil ecuaciones.
+
 > **Definición:**: Es una técnica que consiste en encontrar un polinomio que pase exactamente por un conjunto de puntos dados. Dado un conjunto de $n+1$ puntos, existe un único polinomio de grado *n* que satisface todas las condiciones de interpolación, resultado garantizado por el determinante de Vandermonde.
 
 ## El Polinomio de Interpolación: Concepto General
@@ -203,6 +205,9 @@ $$f(x) = \frac{1}{1 + 25x^2}, \quad x \in [-1, 1]$$
 
 Con nodos equidistantes, el polinomio oscila violentamente cerca de $x = \pm 1$, alejándose de la función real.
 
+![Fenómeno de Runge con nodos equiespaciados](./imagenes/runge-equispaciados.png)
+*Figura 1: La campana de Runge frente a polinomios globales de grados 4, 10 y 16 con nodos equiespaciados. A mayor grado, las oscilaciones en los extremos empeoran en lugar de mejorar.*
+
 **Soluciones:**
 - **Nodos de Chebyshev:** Distribuir los puntos con mayor densidad en los extremos (raíces de polinomios de Chebyshev). Estabiliza el polinomio global.
 - **Splines:** Dividir el dominio en subintervalos y usar polinomios de grado bajo en cada tramo. Elimina las oscilaciones por completo.
@@ -239,6 +244,9 @@ $$x_k = \cos\left( \frac{2k + 1}{2(n+1)} \pi \right), \quad k = 0, 1, \ldots, n$
 
 $$t_k = \frac{a + b}{2} + \frac{b - a}{2} x_k$$
 
+![Nodos de Chebyshev vs nodos equiespaciados](./imagenes/chebyshev-vs-equispaciados.png)
+*Figura 2: Con el mismo grado (16), los nodos equiespaciados detonan las oscilaciones de Runge mientras que los nodos de Chebyshev —más densos en los extremos— se ajustan a la campana con error máximo inferior al 0.1 %.*
+
 **Ejemplo práctico**: Consulta el [Ejemplo 5](./ejemplos/ejemplo-5.md) para ver una aplicación paso a paso del método de Chebyshev.
 
 **Implementación**: Revisa el [código en Python](./codigo/chebyshev-polinomio.py) que implementa los nodos de Chebyshev y los compara con nodos equiespaciados.
@@ -269,6 +277,9 @@ La progresión lógica de esta necesidad de mayor suavidad da origen a la **Inte
 Para el caso más básico, la ecuación de la recta en $[x_i, x_{i+1}]$ es:
 
 $$P_i(x) = f(x_i) + \frac{f(x_{i+1}) - f(x_i)}{x_{i+1} - x_i} (x - x_i)$$
+
+![Segmentaria lineal vs Spline cúbico](./imagenes/segmentaria-vs-spline.png)
+*Figura 3: La interpolación lineal a trozos (clase $C^0$) produce picos visibles en los nodos; el spline cúbico (clase $C^2$) conecta los mismos puntos con curvatura continua.*
 
 **Ejemplo práctico**: Consulta el [Ejemplo 6](./ejemplos/ejemplo-6.md) para ver una aplicación paso a paso de la interpolación segmentaria lineal.
 
@@ -310,6 +321,9 @@ Definiendo la distancia entre nodos como $h_j = x_{j+1} - x_j$, los coeficientes
 3. $b_j = \frac{f(x_{j+1}) - f(x_j)}{h_j} - \frac{h_j(2c_j + c_{j+1})}{3}$
 4. $d_j = \frac{c_{j+1} - c_j}{3h_j}$
 
+![Spline cúbico vs polinomio global](./imagenes/spline-vs-global.png)
+*Figura 4: Sobre los mismos 12 nodos de la campana de Runge, el polinomio global oscila salvajemente mientras el spline cúbico natural sigue la función con suavidad (error máximo menor a 0.01).*
+
 **Ejemplo práctico**: Consulta el [Ejemplo 4](./ejemplos/ejemplo-4.md) para ver una aplicación paso a paso del método de Splines.
 
 **Implementación**: Revisa el [código en Python](./codigo/spline-polinomio.py) que implementa el algoritmo de interpolación por Splines Cúbicos.
@@ -334,6 +348,9 @@ Desarrollada:
 $$P_n(x) = f(x_0) + f'(x_0)(x - x_0) + \frac{f''(x_0)}{2!}(x - x_0)^2 + \cdots + \frac{f^{(n)}(x_0)}{n!}(x - x_0)^n$$
 
 Cuando $x_0 = 0$, el polinomio recibe el nombre de **Polinomio de Maclaurin**.
+
+![Aproximación local de Taylor](./imagenes/taylor-local.png)
+*Figura 5: Polinomios de Taylor de $f(x)=\sin(x)$ centrados en $x_0=0$ con grados crecientes. La precisión es imbatible cerca del punto base, pero cada polinomio diverge estrepitosamente al alejarse de él.*
 
 ### Término del Error (Resto de Lagrange)
 
