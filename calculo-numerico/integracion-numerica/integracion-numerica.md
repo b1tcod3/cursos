@@ -180,6 +180,98 @@ La consecuencia práctica se lee en la potencia de $h$: **reducir el paso a la m
 
 En escala logarítmica las pendientes delatan el orden: Trapecio desciende con pendiente $-2$ (error $\propto h^2$) y Simpson con pendiente $-4$ (error $\propto h^4$). Gauss-Legendre y Romberg, que refinamos más adelante, ni siquiera necesitan mallas finas para competir.
 
+## De la Fórmula al Software: Implementación General y Módulos
+
+La matemática ya está resuelta; lo que sigue es una lección de ingeniería de software que el texto guía dedica a dos decisiones que separan un script desechable de una herramienta reutilizable: *cómo diseñar la función* y *cómo empaquetarla en un módulo*.
+
+### El dilema del programador: ¿específico o general?
+
+Supongamos que el problema del día es calcular el desplazamiento de un objeto a partir de su velocidad $v(t) = 3t^2 e^{t^3}$:
+
+$$s = \int_0^1 3t^2 e^{t^3}\,dt$$
+
+Hay dos formas de enfrentarse al código:
+
+* **Implementación específica (mala idea):** escribir un bucle donde se cambian las variables `x` por `t`, `f` por `v` y `h` por `dt` "a mano", produciendo una función que solo sirve para este problema exacto. La próxima integral exige reescribir todo.
+* **Implementación general (la forma correcta):** escribir una única función genérica `trapecio_compuesto(f, a, b, n)` que siga la fórmula matemática pura y reciba la función como argumento. Para nuestro problema de física, simplemente le pasamos `v`.
+
+> **La filosofía:** la alternativa general es la esencia del poder de las matemáticas. Permite escribir una herramienta **una sola vez** y usarla para cualquier problema futuro.
+
+### La función general en su forma compacta
+
+La misma lógica del snippet anterior, escrita en versión estilizada:
+
+```python
+def trapecio_compuesto(f, a, b, n):
+    h = (b - a) / n
+    suma = 0.5 * f(a) + 0.5 * f(b)  # Inicializamos con los bordes
+    for i in range(1, n):
+        suma += f(a + i * h)        # Sumamos los puntos interiores
+    suma *= h                       # Multiplicamos todo por h
+    return suma
+```
+
+> **Nota:** `+=` significa "sumar al valor existente" y `*=` significa "multiplicar el valor existente".
+
+### Resolviendo el problema de física
+
+Con la herramienta genérica lista, la sesión interactiva (consola o Jupyter) para resolver nuestra integral de velocidad queda así:
+
+```python
+from math import exp
+
+v = lambda t: 3 * t**2 * exp(t**3)   # la función específica entra como argumento
+numerical = trapecio_compuesto(v, 0, 1, 4)
+```
+
+**Resultado con 4 trapecios ($n=4$):**
+
+| Magnitud | Valor |
+|---|---|
+| Aproximación | $1.9227$ |
+| Valor exacto ($e - 1$, con antiderivada $V(t) = e^{t^3}$) | $1.7182818285$ |
+| Error | $\approx 0.2044$ |
+
+El error es bastante grande. ¿Cómo lo arreglamos? Como predijo la teoría: aumentando el número de trapecios.
+
+**Resultado con 400 trapecios ($n=400$):** error $= 0.0000212$ ($2.12 \times 10^{-5}$).
+
+Con 400 trapecios, la recta de cada subintervalo casi calca la curva exponencial y el error se vuelve minúsculo — coherente con el orden global $O(h^2)$: pasar de $h = 0.25$ a $h = 0.0025$ (factor $10^2$) reduce el error aproximadamente $10^4$ veces.
+
+### Un módulo profesional: el bloque `if __name__ == '__main__':`
+
+El paso final es empaquetar todo en un archivo reutilizable, `trapecio.py`, separando la herramienta genérica de su prueba de uso:
+
+```python
+def trapecio_compuesto(f, a, b, n):
+    # (el código de la función general va aquí)
+    pass
+
+def application():
+    from math import exp
+    v = lambda t: 3 * t**2 * exp(t**3)   # lambda: función anónima definida al vuelo
+    n = int(input('n: '))
+
+    numerical = trapecio_compuesto(v, 0, 1, n)
+
+    V = lambda t: exp(t**3)              # antiderivada para comparar con el exacto
+    exact = V(1) - V(0)
+    error = abs(exact - numerical)
+
+    print('n={:d}: {:.16f}, error: {:g}'.format(n, numerical, error))
+
+# EL BLOQUE MÁGICO
+if __name__ == '__main__':
+    application()
+```
+
+**¿Por qué existe `if __name__ == '__main__':`?** Es lo que convierte tu archivo en un **módulo reutilizable**:
+
+* Si ejecutas el archivo directamente (`python trapecio.py`), Python asume que es el "programa principal" (`__main__`): la condición es verdadera y ejecuta la prueba matemática `application()`.
+* Si mañana estás en otro proyecto y escribes `from trapecio import trapecio_compuesto`, Python **no** ejecuta `application()`: importa la función general en silencio, lista para tu nuevo problema.
+
+Nuestro [`codigo/trapecio.py`](./codigo/trapecio.py) adopta exactamente este patrón: la función genérica arriba y la demostración bajo el bloque `__main__`, para que puedas importarla sin efectos secundarios o ejecutarla para ver el ejemplo funcionando.
+
 ## Teoría del Error y Grado de Precisión
 
 > **Grado de precisión:** el mayor grado polinomial $m$ tal que la fórmula integra **exactamente** todo polinomio de grado $\le m$. Es la tarjeta de identidad de cualquier cuadratura.
